@@ -185,7 +185,7 @@ a:hover{
   top:30px;
 }
 .dots{
-  fill: red;
+  fill: #f44242;
   opacity: 0.8;
 }
 
@@ -202,3 +202,17 @@ a:hover{
   font-size: 10px; 
 
 }
+
+div.tooltip {   
+  position: absolute;           
+  text-align: center;           
+  width: 150px;                  
+  height: 25px;                 
+  padding: 2px;             
+  font-size: 10px;     
+  background: #dbdbdb;
+  border: 1px;      
+  border-radius: 8px;           
+  pointer-events: none;  
+  z-index: 90      
+} 
