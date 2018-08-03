@@ -1,0 +1,168 @@
+function generateVis(canvas){
+  //Width and height of map
+
+  var lowColor = '#f9f9f9'
+  var highColor = '#16ad1b'
+  var margin = {top: 0, right: 10, bottom: 30, left: 10};
+  var width = 650 -margin.left-margin.right;
+  var height = 550-margin.top - margin.bottom;
+  // D3 Projection
+  var projection = d3.geoAlbersUsa()
+    .translate([width / 2, height / 2]) // translate to center of screen
+    .scale([800]); // scale things down so see entire US
+
+  // Define path generator
+  var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+    .projection(projection); // tell path generator to use albersUsa projection
+
+
+  //Create SVG element and append map to the SVG
+  var svg = d3.select("#" + canvas)
+    // .append("svg")
+    .attr("width", width-margin.left-margin.right)
+    .attr("height", height-margin.top - margin.bottom);
+
+  // Load in my states data!
+  d3.csv("storms-death-data.csv", function(data) {
+    var dataArray = [];
+    var dataArray2 = [];
+    for (var d = 0; d < data.length; d++) {
+      dataArray.push(parseFloat(data[d].value));
+      dataArray2.push(parseFloat(data[d].deaths));
+    }
+    var minVal = d3.min(dataArray)
+    var maxVal = d3.max(dataArray)
+    var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor])
+    var radius = d3.scaleLinear().domain([d3.min(dataArray2),d3.max(dataArray2)]).range([1,25])
+    
+    // Load GeoJSON data and merge with states data
+    d3.json("us-states.json", function(json) {
+
+      // Loop through each state data value in the .csv file
+      for (var i = 0; i < data.length; i++) {
+
+        // Grab State Name
+        var dataState = data[i].state.toProperCase();
+
+        // Grab data value 
+        var dataValue = data[i].value;
+        var dataValue2 = data[i].deaths; 
+
+        // Find the corresponding state inside the GeoJSON
+        for (var j = 0; j < json.features.length; j++) {
+          var jsonState = json.features[j].properties.name;
+
+          if (dataState == jsonState) {
+
+            // Copy the data value into the JSON
+            json.features[j].properties.value = dataValue;
+            json.features[j].properties.value2 = dataValue2;
+
+            // Stop looking through the JSON
+            break;
+          }
+        }
+      }
+
+      // Bind the data to the SVG and create one path per GeoJSON feature
+      svg.selectAll("path")
+        .data(json.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .style("stroke", "#fff")
+        .style("stroke-width", "1")
+        .style("fill", function(d) { return ramp(d.properties.value) });
+
+      // Drawing the second variable on the map
+      svg.selectAll(".dots")
+        .data(json.features)
+        .enter()
+        .append("circle")
+        .attr("class","dots")
+        .attr("r", function (d){
+          return radius(d.properties.value2)
+        })
+        .attr("fill","black")
+        .attr("transform",function(d){
+          var p = path.centroid(d); //<-- centroid is the center of the path, projection maps it to pixel positions
+          // console.log(p);
+          return "translate("+p+")";
+        });
+
+      
+      // add a legend
+      var w = 150, h = 10;
+
+      // var key = d3.select("body")
+      var key = svg
+        .append("g")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("class", "legend");
+
+      var legend = key.append("defs")
+        .append("g:linearGradient")
+        .attr("id", "gradient")
+        .attr("x1", "100%")
+        .attr("y1", "100%")
+        .attr("x2", "0%")
+        .attr("y2", "100%")
+        .attr("spreadMethod", "pad");
+
+      legend.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", highColor)
+        .attr("stop-opacity", 1);
+        
+      legend.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", lowColor)
+        .attr("stop-opacity", 1);
+
+      key.append("rect")
+        .attr("width", w)
+        .attr("height", h)
+        .style("fill", "url(#gradient)")
+        .attr("transform", "translate("+(width/2 - w) +","+(height-50)+")");
+      
+      //Adding legend values
+      key.append("text")
+        .attr("class", "legend-text")
+        .attr("x",width/2 - w)
+        .attr("y",height-50)
+        .text(minVal);
+
+      key.append("text")
+      .attr("class", "legend-text")
+        .attr("x",width/2 - getTextWidth(maxVal, 10,  " Segoe UI"))
+        .attr("y",height-52)
+        .text(maxVal);
+
+      key.append("circle")
+        .attr("class", "dots")
+        .attr("cx",width/2 + 30 )
+        .attr("cy",height-48)
+        .attr("r",10)
+
+      key.append("text")
+        .attr("class", "legend-text")
+        .attr("x",width/2 + 43 )
+        .attr("y",height-44)
+        .text("No. of deaths")
+
+
+    });
+  });
+}
+// https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
+String.prototype.toProperCase = function () {
+    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+// https://stackoverflow.com/questions/29031659/calculate-width-of-text-before-drawing-the-text
+function getTextWidth(text, fontSize, fontFace) {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.font = fontSize + 'px ' + fontFace;
+    return context.measureText(text).width;
+} 
