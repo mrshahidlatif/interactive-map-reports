@@ -1,6 +1,6 @@
-function generateVis(canvas){
+function generateVis(canvas, config){
   //Width and height of map
-
+// console.log(config.indVariable); 
   var lowColor = '#f9f9f9'
   var highColor = '#16ad1b'
   var margin = {top: 0, right: 10, bottom: 30, left: 10};
@@ -27,8 +27,8 @@ function generateVis(canvas){
     var dataArray = [];
     var dataArray2 = [];
     for (var d = 0; d < data.length; d++) {
-      dataArray.push(parseFloat(data[d].value));
-      dataArray2.push(parseFloat(data[d].deaths));
+      dataArray.push(parseFloat(data[d][config.indVariable]));
+      dataArray2.push(parseFloat(data[d][config.depVariable]));
     }
     var minVal = d3.min(dataArray)
     var maxVal = d3.max(dataArray)
@@ -45,8 +45,8 @@ function generateVis(canvas){
         var dataState = data[i].state.toProperCase();
 
         // Grab data value 
-        var dataValue = data[i].value;
-        var dataValue2 = data[i].deaths; 
+        var dataValue = data[i][config.indVariable];
+        var dataValue2 = data[i][config.depVariable]; 
 
         // Find the corresponding state inside the GeoJSON
         for (var j = 0; j < json.features.length; j++) {
@@ -81,7 +81,7 @@ function generateVis(canvas){
           d3.select(this).transition().duration(300).style("opacity", 1);
           div.transition().duration(300)
           .style("opacity", 1)
-          div.text(d.properties.name + " : " + d.properties.value + " storms")
+          div.text(d.properties.name + " : " + d.properties.value + " " + config.indVariable)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY -30) + "px");
         })
@@ -92,6 +92,7 @@ function generateVis(canvas){
           div.transition().duration(300)
           .style("opacity", 0);
         })
+        .on("click",function(d){explainOnDemand(d.properties.name)})
 
       // Drawing the second variable on the map
       svg.selectAll(".dots")
@@ -112,7 +113,7 @@ function generateVis(canvas){
           d3.select(this).transition().duration(300).style("opacity", 1);
           div.transition().duration(300)
           .style("opacity", 1)
-          div.text(d.properties.name + " : " + d.properties.value2 + " deaths")
+          div.text(d.properties.name + " : " + d.properties.value2 + " "+ config.depVariable)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY -30) + "px");
         })

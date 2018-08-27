@@ -1,0 +1,6 @@
+{
+	"openingSentence": "The visualization shows number of <variable2> in <country> caused by <variable1> during <year>.",
+	"MAX_VAR2": " Maximum number of deaths <variable2> were reported in <location>.",
+	"MAX_VAR1": " The state of <location> experienced most number of storms <variable1>."
+
+}

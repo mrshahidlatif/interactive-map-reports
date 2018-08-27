@@ -1,0 +1,10 @@
+{
+	"geoRegion": "the United States of America",
+	"granularity":"state",
+	"RegionID" : "id",
+	"indVariable": "storms",
+	"depVariable": "deaths",
+	"unit": "number",
+	"situation": "negative",
+	"year":"2017"
+}

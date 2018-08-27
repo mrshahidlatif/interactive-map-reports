@@ -4,6 +4,10 @@
 <head>
   <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="lib/simple-statistics.min.js"></script>
+  <script src="lib/mahalanobis.min.js"></script>
+  <script src="geo_neighbors.js"></script>
+
   <script src="vis.js"></script>
   <script src="nlg.js"></script>
   <script src="dictionary.js"></script>
@@ -32,9 +36,9 @@
       <svg width="600" height="500" id="map"></svg>
     </div>
     <div class="rightcolumn">
-        <h3>Summary</h3>
         <p id="text"></p>
-        <h3>Explanation on demand</h3>
+        <h3 id="eod-head"></h3>
+        <p id="eod"></p>
     </div>
   </div>
   <div class="footer">
@@ -47,12 +51,15 @@
   </div>
   <script>
     var data=[];
-    d3.csv("data/data4nlg.csv", function(d){
+
+    d3.csv("storms-death-data.csv", function(d){
       data = d;
-
-    generateVis("map");
-    document.getElementById("text").innerHTML = generateNarrative(data); 
-
+      d3.json("config.json", function(d){
+        config = d; 
+          generateVis("map", config);
+          var facts = analyse(data, config);
+          document.getElementById("text").innerHTML = generateNarrative(facts, config); 
+      });
     });
 
   </script>
