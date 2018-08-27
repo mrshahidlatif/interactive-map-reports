@@ -42,7 +42,7 @@ function generateVis(canvas, config){
       for (var i = 0; i < data.length; i++) {
 
         // Grab State Name
-        var dataState = data[i].state.toProperCase();
+        var dataState = data[i][config.regionID].toProperCase();
 
         // Grab data value 
         var dataValue = data[i][config.indVariable];
@@ -92,7 +92,7 @@ function generateVis(canvas, config){
           div.transition().duration(300)
           .style("opacity", 0);
         })
-        .on("click",function(d){explainOnDemand(d.properties.name)})
+        .on("click",function(d){explainOnDemand(d.properties.name,config)})
 
       // Drawing the second variable on the map
       svg.selectAll(".dots")
