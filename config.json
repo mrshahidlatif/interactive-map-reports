@@ -1,10 +1,12 @@
 {
-	"geoRegion": "the United States of America",
-	"granularity":"state",
+	"geoRegion": "Europe",
+	"granularity":"country",
 	"regionID" : "id",
-	"indVariable": "storms",
-	"depVariable": "deaths",
+	"indVariable": "health_expenditure",
+	"depVariable": "life_expectancy",
 	"unit": "number",
-	"situation": "negative",
-	"year":"2017"
+	"situation": "positive",
+	"year":"2018",
+	"geoJSONFile":"geography/europe.json",
+	"dataFile":"health-life-expectancy.csv"
 }

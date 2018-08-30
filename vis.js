@@ -1,24 +1,35 @@
 function generateVis(canvas, config){
   //Width and height of map
-// console.log(config.indVariable); 
+  console.log(config.geoJSONFile); 
+
+  var geoJSON = config.geoJSONFile; 
+  var dataFile = config.dataFile;  
+
   var lowColor = '#f9f9f9'
   var highColor = '#16ad1b'
   var margin = {top: 0, right: 10, bottom: 30, left: 10};
   var width = 650 -margin.left-margin.right;
   var height = 550-margin.top - margin.bottom;
+  
   // D3 Projection
+  if(config.geoRegion == "the United States of America"){
   var projection = d3.geoAlbersUsa()
   // var projection = d3.geoEquirectangular()
     .translate([width / 2, height / 2]) // translate to center of screen
     .scale(800); // scale things down so see entire US
+  }
+  else{
+    var projection = d3.geoStereographic()
+    .scale(width*1.5)
+    .translate([width-450, height+220])
+  }
 
   // Define path generator
   var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
     .projection(projection); // tell path generator to use albersUsa projection
 
   //Getting orientation of geographic regions 
-  getOrientations(path);
-
+  // getOrientations(path);
 
   //Create SVG element and append map to the SVG
   var svg = d3.select("#" + canvas)
@@ -27,7 +38,7 @@ function generateVis(canvas, config){
     .attr("height", height-margin.top - margin.bottom);
 
   // Load in my states data!
-  d3.csv("storms-death-data.csv", function(data) {
+  d3.csv(dataFile, function(data) {
     var dataArray = [];
     var dataArray2 = [];
     for (var d = 0; d < data.length; d++) {
@@ -40,7 +51,7 @@ function generateVis(canvas, config){
     var radius = d3.scaleLinear().domain([d3.min(dataArray2),d3.max(dataArray2)]).range([1,25])
     
     // Load GeoJSON data and merge with states data
-    d3.json("us-states.json", function(json) {
+    d3.json(geoJSON, function(json) {
       // d3.json("geography/europe.json", function(json) {
 
       // Loop through each state data value in the .csv file
@@ -48,6 +59,7 @@ function generateVis(canvas, config){
 
         // Grab State Name
         var dataState = data[i][config.regionID].toProperCase();
+        // console.log(dataState); 
 
         // Grab data value 
         var dataValue = data[i][config.indVariable];
@@ -56,9 +68,9 @@ function generateVis(canvas, config){
         // Find the corresponding state inside the GeoJSON
         for (var j = 0; j < json.features.length; j++) {
           var jsonState = json.features[j].properties.name;
+          // console.log(jsonState); 
 
           if (dataState == jsonState) {
-
             // Copy the data value into the JSON
             json.features[j].properties.value = dataValue;
             json.features[j].properties.value2 = dataValue2;

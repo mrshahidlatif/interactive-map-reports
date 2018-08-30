@@ -1,4 +1,5 @@
 var allData; 
+var existNeighborsInfo = false;
 //------------------------------
 //Thresold parameters 
 //------------------------------
@@ -36,20 +37,26 @@ function generateNarrative(data,config){
 
 	//Univariate Outliers
 	var outliers_v2 = getDataByFlag(data,"MAXV2");
-	console.log(outliers_v2);
-	text += stringifyList_v2(outliers_v2);
+	// console.log(outliers_v2);
+	if(outliers_v2.length>0){
+		text += stringifyList_v2(outliers_v2);
+	}
 
 	data.sort(function(a,b){return +b[config.indVariable] - +a[config.indVariable]});
 	// console.log(data); 
 
 	var outliers_v1 = getDataByFlag(data, "MAXV1")
-	text += stringifyList_v1(outliers_v1);
+	if(outliers_v1.length>0){
+		text += stringifyList_v1(outliers_v1);
+	}
 
 
 	var bivariate_outliers = getDataByFlag(data, "BOL");
-	bivariate_outliers.sort(function(a,b){a.v2_v1_ratio - b.v2_v1_ratio});
-	// console.log(bivariate_outliers); 
-	text += " Relatively small number of " + config.indVariable + " did huge damage in " + bivariate_outliers[2][config.regionID].toProperCase()+" killing " + bivariate_outliers[2][config.depVariable] + " people in just " + bivariate_outliers[2][config.indVariable] + " " + config.indVariable +".";
+	if(bivariate_outliers.length>0){
+		bivariate_outliers.sort(function(a,b){a.v2_v1_ratio - b.v2_v1_ratio});
+		// console.log(bivariate_outliers); 
+		// text += " Relatively small number of " + config.indVariable + " did huge damage in " + bivariate_outliers[2][config.regionID].toProperCase()+" killing " + bivariate_outliers[2][config.depVariable] + " people in just " + bivariate_outliers[2][config.indVariable] + " " + config.indVariable +".";
+	}
 
 	return text; 
 }
@@ -153,16 +160,18 @@ function explainOnDemand(name,config){
 	var rank = allData.findIndex(x => x[config.regionID].toLowerCase() == name.toLowerCase()) +1; 
 	exp += " It ranks " + toOrdinal(rank) + " among all regions w.r.t "+ config.depVariable + "."; 
 
-	var neighbors = geo_neighbors[name.toProperCase()].split(",");
-	// console.log(neighbors);
-	var neighbor_objects = getObjectsByNames(allData, neighbors);
-	var arrOfNeighborValues = ListOfObjToArray(neighbor_objects, [config.depVariable]);
+	if(existNeighborsInfo){
+		var neighbors = geo_neighbors[name.toProperCase()].split(",");
+		// console.log(neighbors);
+		var neighbor_objects = getObjectsByNames(allData, neighbors);
+		var arrOfNeighborValues = ListOfObjToArray(neighbor_objects, [config.depVariable]);
 
-	// console.log(arrOfNeighborValues); 
+		// console.log(arrOfNeighborValues); 
 
-	if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])){
-		exp += " Compared to it's neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase() + " shows more " + config.depVariable + ".";
+		if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])){
+			exp += " Compared to it's neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase() + " shows more " + config.depVariable + ".";
 
+		}
 	}
 
 

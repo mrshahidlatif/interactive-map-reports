@@ -51,8 +51,9 @@
   </div>
   <script>
     var data=[];
+    var dataFile = "health-life-expectancy.csv"; 
 
-    d3.csv("storms-death-data.csv", function(d){
+    d3.csv(dataFile, function(d){
       data = d;
       d3.json("config.json", function(d){
         config = d; 
