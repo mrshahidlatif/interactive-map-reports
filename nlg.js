@@ -1,10 +1,18 @@
 var allData; 
+//------------------------------
+//Thresold parameters 
+//------------------------------
+var POSITIVE_CORRELATION = 0.5;
+var NEGATIVE_CORRELATION = -0.5;
+//-------------------------------
+
 function generateNarrative(data,config){
-	console.log(data); 
+
+	console.log(allData);
 	// console.log(config); 
 	var text="";
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
-	console.log(data); 
+
 	//First Sentence
 	if (config.unit == "number"){
 		text += "The map visualization shows number of " + config.depVariable + " caused by " + config.indVariable + " in " + config.geoRegion + " during " + config.year + ".";
@@ -13,6 +21,18 @@ function generateNarrative(data,config){
 	else if (config.unit == "percentage"){
 		text += "The map visualization shows " + config.depVariable + " in proportion to the " + config.indVariable + " in " + config.geoRegion + " during " + config.year + ".";
 	}
+
+	var corr = computeCorrelation(data);
+	// console.log(corr); 
+	if(corr > POSITIVE_CORRELATION){
+		text += " On the whole, large number of " + config.indVariable + " are assoicated with large number of " + config.depVariable+ ".";
+	}
+	else if (corr < NEGATIVE_CORRELATION){
+		text += " On the whole, large number of " + config.indVariable + " are assoicated with small number of " + config.depVariable+ ".";
+
+	}
+
+	text += " "+ config.depVariable.toProperCase() + " varies from "+ getMin(allData, config.depVariable) + " to " + getMax(allData, config.depVariable) + " across various " + config.granularity + " of " + config.geoRegion + "."; 
 
 	//Univariate Outliers
 	var outliers_v2 = getDataByFlag(data,"MAXV2");
@@ -36,7 +56,7 @@ function generateNarrative(data,config){
 function stringifyList_v2(list){
 	var string="";
 	switch (list.length) {
-		case 1:
+		case 1:  
 			string += " Maximum number of " +list[0][config.depVariable] + " " + config.depVariable + " are caused by " + list[0][config.indVariable] + " " + config.indVariable + " in " + list[0][config.regionID].toProperCase() + ".";
 			break;
 		case 2:
@@ -81,17 +101,53 @@ function getDataByFlag(data,flag){
 }
 function explainOnDemand(name,config){
 	var exp = ""; 
-	// console.log(allData); 
 	
 	document.getElementById("eod-head").innerHTML = name.toProperCase();
 	var selectedRegion = allData.filter(function(d){return d[config.regionID].toLowerCase() == name.toLowerCase()});
-	if(selectedRegion[0][config.depVariable] == 0){
-		exp += "There was no fatality in the state of Utah despite "+ selectedRegion[0][config.indVariable] +" stormy events."
-	}
-	else {
-		exp += "In "+ selectedRegion[0][config.regionID].toProperCase() + ", " + selectedRegion[0][config.depVariable] + " " + config.depVariable + " are reported in "+selectedRegion[0].value+ " "+config.indVariable +"." ;
-	}
 	
+	var value_dV = selectedRegion[0][config.depVariable];
+	var value_iV = selectedRegion[0][config.indVariable];
+	var avg_dV = getAverage(allData, config.depVariable);
+	var avg_iV = getAverage(allData, config.indVariable);
+	// console.log(value_iV); 
+
+	//Based on dependant variable
+	if(value_dV == getMin(allData,config.depVariable)) {
+		exp += name.toProperCase() + " has " ;
+		exp += (value_dV==0) ? "no " : "the least number of (" + value_dV+") ";
+		exp += config.depVariable; 
+	}
+	else if(value_dV == getMax(allData,config.depVariable)) {
+		exp += name.toProperCase() + " has " ;
+		exp += (value_dV==0) ? "no " : "the most number of (" + value_dV+") ";
+		exp += config.depVariable; 
+	}
+	else if(value_dV > avg_dV){
+		exp += name.toProperCase() + " has above average number of (" + value_dV + ") "+ config.depVariable;
+	}
+	else if (value_dV < avg_dV){
+		exp += name.toProperCase() + " has below average number of (" + value_dV + ") " + config.depVariable;
+	}
+
+	//Based on independant variable
+	if(value_iV == getMin(allData,config.indVariable)) {
+		exp += " and " ;
+		exp += (value_iV==0) ? "no " : "the least number of (" + value_iV+") ";
+		exp += config.indVariable; 
+	}
+	else if(value_iV == getMax(allData,config.indVariable)) {
+		exp += " and " ;
+		exp += (value_iV==0) ? "no " : "the most number of (" + value_iV+") ";
+		exp += config.indVariable; 
+	}
+	else if(value_iV > avg_iV){
+		exp += " and above average number of (" + value_iV + ") "+ config.indVariable;
+	}
+	else if (value_iV < avg_iV){
+		exp += " and below average number of (" + value_iV + ") " + config.indVariable;
+	}
+
+	exp += " when compared to the whole of " + config.geoRegion + "."; 
 	// console.log(selectedRegion);
 	allData.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 	var rank = allData.findIndex(x => x[config.regionID].toLowerCase() == name.toLowerCase()) +1; 
@@ -105,11 +161,65 @@ function explainOnDemand(name,config){
 	// console.log(arrOfNeighborValues); 
 
 	if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])){
-		exp += " It shows different behavior compared to it's neighboring states."
+		exp += " Compared to it's neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase() + " shows more " + config.depVariable + ".";
+
 	}
 
 
 	document.getElementById("eod").innerHTML = exp;
+}
+function compareTwoRegions(a,b){
+	var comText = "";
+	document.getElementById("eod-head").innerHTML = a + " and " + b;
+
+	var aObj = allData.filter(function(d){return d[config.regionID].toLowerCase() == a.toLowerCase()})[0];
+	var bObj = allData.filter(function(d){return d[config.regionID].toLowerCase() == b.toLowerCase()})[0];
+	// console.log(aObj);
+	// console.log(bObj);
+	var is_a_mentionded = false; 
+	var is_b_mentionded = false; 
+
+	if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
+		comText += a + " has higher " + config.depVariable + " ("+aObj[config.depVariable]+") ";
+		comText += " and higher "+ config.indVariable + " ("+aObj[config.indVariable]+") ";
+		is_a_mentionded= true; 
+	}
+	if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
+		comText += b + " has higher " + config.depVariable + " ("+bObj[config.depVariable]+") ";
+		comText += " and higher "+ config.indVariable + " ("+bObj[config.indVariable]+") "; 
+		is_b_mentionded = true;
+	}
+	if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
+		comText += a + " has higher " + config.depVariable + " ("+aObj[config.depVariable]+") ";
+		comText += " but lower "+ config.indVariable + " ("+aObj[config.indVariable]+") "; 
+		is_a_mentionded= true;
+	}
+	if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
+		comText += b + " has higher " + config.depVariable + " ("+bObj[config.depVariable]+") ";
+		comText += " but lower "+ config.indVariable + " ("+bObj[config.indVariable]+") ";
+		is_b_mentionded = true; 
+	}
+	if (is_a_mentionded){
+		comText += " when compared to " + b + " (" + bObj[config.depVariable]+ " "+ config.depVariable+ ", "+ bObj[config.indVariable] +" "+config.indVariable +")."
+	}
+	if (is_b_mentionded){
+		comText += " when compared to " + a + " (" + aObj[config.depVariable]+ " "+ config.depVariable+ ", "+ aObj[config.indVariable] +" "+config.indVariable +")."
+	}
+	document.getElementById("eod").innerHTML = comText; 
+	is_a_mentionded = false; 
+	is_b_mentionded = false; 
+}
+function stringifyArray(arr){
+	var s = "";
+	for (var i=0;i<arr.length;i++){
+		if (i==arr.length-1){
+			s+= "and "+arr[i];
+		}
+		else {
+			s+= arr[i]+ ", ";
+		}
+	}
+	return s; 
 }
 function ListOfObjToArray(list, column){
 	var arr = [];
@@ -160,6 +270,35 @@ function getObjectsByNames(data, names){
         return i + "rd";
     }
     return i + "th";
+}
+function getMin(data, variable){
+	return d3.min(data, function(d){return +d[variable];});
+
+}
+function getMax(data, variable){
+	return d3.max(data, function(d){return +d[variable];});
+}
+function getAverage(data, variable){
+	var arr= [];
+	for (var i=0;i<data.length;i++){
+		arr.push(+data[i][variable]);
+	}
+	avg = ss.mean(arr);
+
+	return avg; 
+}
+
+function computeCorrelation(data){
+	var var1 = [];
+	var var2 = [];
+	for (var i=0;i<data.length;i++){
+		var1.push(+data[i][config.indVariable]);
+		var2.push(+data[i][config.depVariable]);
+	}
+	//Sample Correlation 
+	corr = ss.sampleCorrelation(var1,var2);
+
+	return corr; 
 }
 
 function analyse(data, config){
@@ -254,3 +393,47 @@ function Create2DArray(rows) {
   return arr;
 }
 
+function getTopNItems(items, minN, maxN) {
+ 
+  //Given [minN, maxN] range: returns the authors in that range by systematically cutting off the list
+  //For instance, check for Fabian Beck, Thomas Ertl, Daniel A. Keim to see its effect
+  var topItems = [];
+  var finaltopItems=[];
+
+  items.sort(function(a, b) {
+    return b.Value - a.Value;
+  });
+  // console.log(items);
+  if (maxN < items.length){
+    for (var i = 0; i <= maxN; i++) {
+        topItems.push(items[i]);
+
+    }   
+  }
+  else {
+    topItems = items;
+  }
+
+  if (topItems.length > minN){
+    // console.log(topItems);
+    var gaps = [];
+    for(var i=minN;i<topItems.length;i++){
+      var gap = topItems[i-1].Value - topItems[i].Value;
+      gaps.push(gap);
+    }
+    // console.log(gaps);
+    var maxGap = d3.max(gaps);
+    var cutPoint = gaps.indexOf(maxGap) + minN ; // adding 1 due to 0-indexing system 
+    // console.log(cutPoint);
+    
+    for (var i=0;i<cutPoint;i++){
+      finaltopItems.push(topItems[i]);
+    }
+  }
+  else {
+    finaltopItems = topItems;
+  }
+  // console.log(finaltopItems); 
+
+  return finaltopItems;
+}

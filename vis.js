@@ -8,12 +8,16 @@ function generateVis(canvas, config){
   var height = 550-margin.top - margin.bottom;
   // D3 Projection
   var projection = d3.geoAlbersUsa()
+  // var projection = d3.geoEquirectangular()
     .translate([width / 2, height / 2]) // translate to center of screen
-    .scale([800]); // scale things down so see entire US
+    .scale(800); // scale things down so see entire US
 
   // Define path generator
   var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
     .projection(projection); // tell path generator to use albersUsa projection
+
+  //Getting orientation of geographic regions 
+  getOrientations(path);
 
 
   //Create SVG element and append map to the SVG
@@ -37,6 +41,7 @@ function generateVis(canvas, config){
     
     // Load GeoJSON data and merge with states data
     d3.json("us-states.json", function(json) {
+      // d3.json("geography/europe.json", function(json) {
 
       // Loop through each state data value in the .csv file
       for (var i = 0; i < data.length; i++) {
@@ -57,7 +62,6 @@ function generateVis(canvas, config){
             // Copy the data value into the JSON
             json.features[j].properties.value = dataValue;
             json.features[j].properties.value2 = dataValue2;
-
             // Stop looking through the JSON
             break;
           }
@@ -66,6 +70,7 @@ function generateVis(canvas, config){
       var div = d3.select("body").append("div")   
                   .attr("class", "tooltip")               
                   .style("opacity", 0);
+      var selectedRegions = []; 
 
       // Bind the data to the SVG and create one path per GeoJSON feature
       svg.selectAll("path")
@@ -73,7 +78,7 @@ function generateVis(canvas, config){
         .enter()
         .append("path")
         .attr("d", path)
-        .style("stroke", "#fff")
+        .style("stroke", "#000")
         .style("stroke-width", "1")
         .style("fill", function(d) { return ramp(d.properties.value) })
          //Adding mouseevents
@@ -92,7 +97,15 @@ function generateVis(canvas, config){
           div.transition().duration(300)
           .style("opacity", 0);
         })
-        .on("click",function(d){explainOnDemand(d.properties.name,config)})
+        .on("click",function(d){
+          selectedRegions.push(d.properties.name); 
+          explainOnDemand(d.properties.name,config);
+          if(d3.event.ctrlKey){
+            selectedRegions.push(d.properties.name);
+            compareTwoRegions(selectedRegions[0],selectedRegions[1],config); 
+            selectedRegions.length = 0; 
+          }
+        });
 
       // Drawing the second variable on the map
       svg.selectAll(".dots")
@@ -200,4 +213,37 @@ function getTextWidth(text, fontSize, fontFace) {
     var context = canvas.getContext('2d');
     context.font = fontSize + 'px ' + fontFace;
     return context.measureText(text).width;
-} 
+}
+
+//labelling the regions with North, South, East, and West 
+function getOrientations(path){
+  var geoRegionCenter; 
+  d3.json("geography/countries/USA.geo.json", function(json) {
+     for (var j = 0; j < json.features.length; j++) {
+          var stateName = json.features[j].properties.name;
+          geoRegionCenter = path.centroid(json.features[j].geometry); 
+          //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
+        }
+   
+    // console.log(geoRegionCenter); 
+    d3.json("us-states.json", function(json) {
+       for (var j = 0; j < json.features.length; j++) {
+            var stateName = json.features[j].properties.name;
+            var currentCenter = path.centroid(json.features[j].geometry); 
+            //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
+            if(currentCenter[1]<geoRegionCenter[1]){
+              console.log( stateName + " : " + "North"); 
+            }
+            else {
+              console.log( stateName + " : " + "South");
+            }
+            if(currentCenter[0]<geoRegionCenter[0]){
+              console.log( stateName + " : " + "West"); 
+            }
+            else {
+              console.log( stateName + " : " + "East");
+            }
+          }
+    });
+  });
+}
