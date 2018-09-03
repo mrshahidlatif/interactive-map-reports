@@ -37,7 +37,7 @@ function generateNarrative(data,config){
 	text += " "+ config.depVariable.toProperCase() + " varies from "+ getMin(allData, config.depVariable) + " to " + getMax(allData, config.depVariable) + " across various " + config.granularity + " of " + config.geoRegion + "."; 
 
 	//Spatial trend in values
-	text += computeSpatialTrends(allData,config); 
+	computeSpatialTrends(allData,config); 
 
 	//Univariate Outliers
 	var outliers_v2 = getDataByFlag(data,"MAXV2");
@@ -53,7 +53,6 @@ function generateNarrative(data,config){
 	if(outliers_v1.length>0){
 		text += stringifyList_v1(outliers_v1);
 	}
-
 
 	var bivariate_outliers = getDataByFlag(data, "BOL");
 	if(bivariate_outliers.length>0){
@@ -520,23 +519,77 @@ function generateSpatialTrendText(e,w,n,s,config){
 	var max_i = ss.max(ewns_i_arr);
 	console.log(ewns_i_arr); 
 	var max_i_index = ewns_i_arr.indexOf(max_i);
-	console.log(max_i_index);
+	console.log(max_i_index); 
 
 	switch (max_i_index) {
 		case 0:
 			text += " Eastern "+ config.granularity + " show more " + config.indVariable ; 
+			if(max_d_index == 0){
+				text = " Eastern "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+			}
 			break;
 		case 1:
-			text += " Western "+ config.granularity + " show more " + config.indVariable ; 
+			text += " Western "+ config.granularity + " show more " + config.indVariable ;
+			if(max_d_index == 1){
+				text = " Western "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+			} 
 			break;
 		case 2:
-			text += " Northern "+ config.granularity + " show more " + config.indVariable ; 
+			text += " Northern "+ config.granularity + " show more " + config.indVariable ;
+			if(max_d_index == 2){
+				text = " Northern "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+			}
 			break;
 		case 3:
-			text += " Southern "+ config.granularity + " show more " + config.indVariable ; 
+			text += " Southern "+ config.granularity + " show more " + config.indVariable ;
+			if(max_d_index == 3){
+				text = " Southern "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+			}
 			break;
 	}
-	
+	text += ".";
+
+	//Correlations among regions 
+	var corr_e = ss.sampleCorrelation(eda, eia);
+	var corr_w = ss.sampleCorrelation(wda, wia);
+	var corr_n = ss.sampleCorrelation(nda, nia);
+	var corr_s = ss.sampleCorrelation(sda, sia);
+	var corr_arr = [corr_e, corr_w, corr_n, corr_s]; 
+	var pos_corr_arr = []; 
+	var neg_corr_arr = [];
+
+	 for(var i=0;i<corr_arr.length;i++){
+		if(corr_arr[i] > POSITIVE_CORRELATION){
+			pos_corr_arr.push(i);
+		}
+		if(corr_arr[i] < NEGATIVE_CORRELATION){
+			neg_corr_arr.push(i);
+		}
+	}
+	// console.log(corr_arr);
+	var directions = ["Easter", "Western", "Northern", "Southern"];
+	if(pos_corr_arr.length>0){
+		text += " Positive correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
+		if(pos_corr_arr.length==1)
+			text += directions[pos_corr_arr[0]] + config.granularity;
+		else if(pos_corr_arr.length==2)
+			text += directions[pos_corr_arr[0]] + " and " + directions[pos_corr_arr[1]] + " " + config.granularity;
+		for(var i=0;i<pos_corr_arr.length; i++){
+			
+		}
+		 
+	}
+
+	if(neg_corr_arr.length>0){
+		text += " Negative correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
+		if(pos_corr_arr.length==1)
+			text += directions[pos_corr_arr[0]] + config.granularity;
+		else if(pos_corr_arr.length==2)
+			text += directions[pos_corr_arr[0]] + " and " + directions[pos_corr_arr[1]] + " " + config.granularity;
+		for(var i=0;i<pos_corr_arr.length; i++){
+			
+		} 
+	}
 	return text + "."; 
 }
 
