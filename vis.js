@@ -1,6 +1,12 @@
+//-------------------------------------------------
+//Global Variables
+//-------------------------------------------------
+var path; 
+//-------------------------------------------------
+
 function generateVis(canvas, config){
   //Width and height of map
-  console.log(config.geoJSONFile); 
+  // console.log(config.geoJSONFile); 
 
   var geoJSON = config.geoJSONFile; 
   var dataFile = config.dataFile;  
@@ -25,7 +31,7 @@ function generateVis(canvas, config){
   }
 
   // Define path generator
-  var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+  path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
     .projection(projection); // tell path generator to use albersUsa projection
 
   //Getting orientation of geographic regions 
@@ -228,34 +234,50 @@ function getTextWidth(text, fontSize, fontFace) {
 }
 
 //labelling the regions with North, South, East, and West 
-function getOrientations(path){
-  var geoRegionCenter; 
-  d3.json("geography/countries/USA.geo.json", function(json) {
-     for (var j = 0; j < json.features.length; j++) {
-          var stateName = json.features[j].properties.name;
-          geoRegionCenter = path.centroid(json.features[j].geometry); 
-          //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
-        }
+// function getOrientations(path){
+//   var geoRegionCenter; 
+//   d3.json("geography/countries/USA.geo.json", function(json) {
+//      for (var j = 0; j < json.features.length; j++) {
+//           var stateName = json.features[j].properties.name;
+//           geoRegionCenter = path.centroid(json.features[j].geometry); 
+//           //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
+//         }
    
-    // console.log(geoRegionCenter); 
-    d3.json("us-states.json", function(json) {
-       for (var j = 0; j < json.features.length; j++) {
-            var stateName = json.features[j].properties.name;
-            var currentCenter = path.centroid(json.features[j].geometry); 
-            //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
-            if(currentCenter[1]<geoRegionCenter[1]){
-              console.log( stateName + " : " + "North"); 
-            }
-            else {
-              console.log( stateName + " : " + "South");
-            }
-            if(currentCenter[0]<geoRegionCenter[0]){
-              console.log( stateName + " : " + "West"); 
-            }
-            else {
-              console.log( stateName + " : " + "East");
-            }
-          }
-    });
-  });
-}
+//     // console.log(geoRegionCenter); 
+//     d3.json("us-states.json", function(json) {
+//        for (var j = 0; j < json.features.length; j++) {
+//             var stateName = json.features[j].properties.name;
+//             var currentCenter = path.centroid(json.features[j].geometry); 
+//             //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
+//             if(currentCenter[1]<geoRegionCenter[1]){
+//               var o = new Object();
+//               o["regionName"] = stateName;
+//               o["orientation"] = "North"
+//               geoOrientationData.push(o);
+//               // console.log( stateName + " : " + "North"); 
+//             }
+//             else {
+//               var o = new Object();
+//               o["regionName"] = stateName;
+//               o["orientation"] = "South"
+//               geoOrientationData.push(o);
+//               // console.log( stateName + " : " + "South");
+//             }
+//             if(currentCenter[0]<geoRegionCenter[0]){
+//                 var o = new Object();
+//               o["regionName"] = stateName;
+//               o["orientation"] = "West"
+//               geoOrientationData.push(o);
+//               // console.log( stateName + " : " + "West"); 
+//             }
+//             else {
+//               var o = new Object();
+//               o["regionName"] = stateName;
+//               o["orientation"] = "East"
+//               geoOrientationData.push(o);
+              
+//             }
+//           }
+//     });
+//   });
+// }

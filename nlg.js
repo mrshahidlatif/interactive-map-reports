@@ -1,5 +1,5 @@
 var allData; 
-var existNeighborsInfo = false;
+var existNeighborsInfo = true;
 //------------------------------
 //Thresold parameters 
 //------------------------------
@@ -9,8 +9,9 @@ var NEGATIVE_CORRELATION = -0.5;
 
 function generateNarrative(data,config){
 
-	console.log(allData);
-	// console.log(config); 
+	// console.log(allData);
+	// console.log(config);
+	// console.log(geoOrientationData);
 	var text="";
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
@@ -23,8 +24,8 @@ function generateNarrative(data,config){
 		text += "The map visualization shows " + config.depVariable + " in proportion to the " + config.indVariable + " in " + config.geoRegion + " during " + config.year + ".";
 	}
 
-	var corr = computeCorrelation(data);
-	// console.log(corr); 
+	var corr = computeCorrelation(allData);
+	console.log(corr); 
 	if(corr > POSITIVE_CORRELATION){
 		text += " On the whole, large number of " + config.indVariable + " are assoicated with large number of " + config.depVariable+ ".";
 	}
@@ -34,6 +35,9 @@ function generateNarrative(data,config){
 	}
 
 	text += " "+ config.depVariable.toProperCase() + " varies from "+ getMin(allData, config.depVariable) + " to " + getMax(allData, config.depVariable) + " across various " + config.granularity + " of " + config.geoRegion + "."; 
+
+	//Spatial trend in values
+	text += computeSpatialTrends(allData,config); 
 
 	//Univariate Outliers
 	var outliers_v2 = getDataByFlag(data,"MAXV2");
@@ -400,6 +404,140 @@ function Create2DArray(rows) {
   }
 
   return arr;
+}
+function computeSpatialTrends(data,config){
+  var text="";
+  var geoOrientationData=[];
+  var easternRegions = [];
+  var westernRegions = [];
+  var southernRegions = [];
+  var northernRegions = [];
+
+  //Computing the orientations of geographical regions 
+  var geoRegionCenter; 
+  d3.json("geography/countries/USA.geo.json", function(json) {
+     for (var j = 0; j < json.features.length; j++) {
+          var stateName = json.features[j].properties.name;
+          geoRegionCenter = path.centroid(json.features[j].geometry); 
+          //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
+        }
+   
+    // console.log(geoRegionCenter); 
+    d3.json("us-states.json", function(json) {
+       for (var j = 0; j < json.features.length; j++) {
+            var stateName = json.features[j].properties.name;
+            var currentCenter = path.centroid(json.features[j].geometry); 
+            //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
+            if(currentCenter[1]<geoRegionCenter[1]){
+              var o = new Object();
+              o["regionName"] = stateName;
+              o["orientation"] = "North"
+              geoOrientationData.push(o);
+              // console.log( stateName + " : " + "North"); 
+            }
+            else {
+              var o = new Object();
+              o["regionName"] = stateName;
+              o["orientation"] = "South"
+              geoOrientationData.push(o);
+              // console.log( stateName + " : " + "South");
+            }
+            if(currentCenter[0]<geoRegionCenter[0]){
+                var o = new Object();
+              o["regionName"] = stateName;
+              o["orientation"] = "West"
+              geoOrientationData.push(o);
+              // console.log( stateName + " : " + "West"); 
+            }
+            else {
+              var o = new Object();
+              o["regionName"] = stateName;
+              o["orientation"] = "East"
+              geoOrientationData.push(o);
+              
+            }
+          }
+
+		for(var i=0;i<data.length;i++){
+			for(var j=0;j<geoOrientationData.length;j++){
+				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "East"){
+					easternRegions.push(data[i]); 
+				}
+				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "West"){
+					westernRegions.push(data[i]); 
+				}
+				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "North"){
+					northernRegions.push(data[i]); 
+				}
+				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "South"){
+					southernRegions.push(data[i]); 
+				}
+			}
+		}
+		 text += generateSpatialTrendText(easternRegions,westernRegions,northernRegions,southernRegions, config);
+		 document.getElementById("strend").innerHTML = text ; 
+		 
+    });
+  });
+ 
+} 
+function generateSpatialTrendText(e,w,n,s,config){
+	var text = "";
+
+	var eda = ListOfObjToArray(e,config.depVariable);
+	var wda = ListOfObjToArray(w,config.depVariable);
+	var nda = ListOfObjToArray(n,config.depVariable);
+	var sda = ListOfObjToArray(s,config.depVariable);
+	var ewns_arr = [ss.sum(eda),ss.sum(wda),ss.sum(nda),ss.sum(sda)]; 
+	var max_d = ss.max(ewns_arr);
+	// console.log(max_d); 
+	var max_d_index = ewns_arr.indexOf(max_d);
+	// console.log(max_d_index);
+
+	switch (max_d_index) {
+		case 0:
+			text += " Eastern "+ config.granularity + " show more " + config.depVariable ; 
+			break;
+		case 1:
+			text += " Western "+ config.granularity + " show more " + config.depVariable ; 
+			break;
+		case 2:
+			text += " Northern "+ config.granularity + " show more " + config.depVariable ; 
+			break;
+		case 3:
+			text += " Southern "+ config.granularity + " show more " + config.depVariable ; 
+			break;
+	}
+	// console.log(text);
+
+	text +=  ", whereas ";
+
+	var eia = ListOfObjToArray(e,config.indVariable);
+	var wia = ListOfObjToArray(w,config.indVariable);
+	var nia = ListOfObjToArray(n,config.indVariable);
+	var sia = ListOfObjToArray(s,config.indVariable);
+	var ewns_i_arr = [ss.sum(eia),ss.sum(wia),ss.sum(nia),ss.sum(sia)]; 
+	var max_i = ss.max(ewns_i_arr);
+	console.log(ewns_i_arr); 
+	var max_i_index = ewns_i_arr.indexOf(max_i);
+	console.log(max_i_index);
+
+	switch (max_i_index) {
+		case 0:
+			text += " Eastern "+ config.granularity + " show more " + config.indVariable ; 
+			break;
+		case 1:
+			text += " Western "+ config.granularity + " show more " + config.indVariable ; 
+			break;
+		case 2:
+			text += " Northern "+ config.granularity + " show more " + config.indVariable ; 
+			break;
+		case 3:
+			text += " Southern "+ config.granularity + " show more " + config.indVariable ; 
+			break;
+	}
+	
+	return text + "."; 
 }
 
 function getTopNItems(items, minN, maxN) {

@@ -37,6 +37,8 @@
     </div>
     <div class="rightcolumn">
         <p id="text"></p>
+        <p id="strend"></p>
+
         <h3 id="eod-head"></h3>
         <p id="eod"></p>
     </div>
@@ -51,12 +53,10 @@
   </div>
   <script>
     var data=[];
-    var dataFile = "health-life-expectancy.csv"; 
-
-    d3.csv(dataFile, function(d){
-      data = d;
-      d3.json("config.json", function(d){
-        config = d; 
+    d3.json("config.json", function(d){
+      config = d; 
+      d3.csv(config.dataFile, function(d){
+        data = d;
           generateVis("map", config);
           var facts = analyse(data, config);
           document.getElementById("text").innerHTML = generateNarrative(facts, config); 
