@@ -1,5 +1,6 @@
 {
 	"geoRegion": "the United States of America",
+	"geoJSONRegion":"geography/countries/USA.geo.json",
 	"granularity":"states",
 	"regionID" : "id",
 	"indVariable": "storms",

@@ -41,8 +41,13 @@ function generateVis(canvas, config){
   var svg = d3.select("#" + canvas)
     // .append("svg")
     .attr("width", width-margin.left-margin.right)
-    .attr("height", height-margin.top - margin.bottom);
+    .attr("height", height-margin.top - margin.bottom)
+    .call(d3.zoom().on("zoom", function () {
+              svg.attr("transform", d3.event.transform)
+      }))
+    .append("g");
 
+  
   // Load in my states data!
   d3.csv(dataFile, function(data) {
     var dataArray = [];
@@ -54,12 +59,11 @@ function generateVis(canvas, config){
     var minVal = d3.min(dataArray)
     var maxVal = d3.max(dataArray)
     var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor])
-    var radius = d3.scaleLinear().domain([d3.min(dataArray2),d3.max(dataArray2)]).range([1,25])
+    var radius = d3.scaleLinear().domain([d3.min(dataArray2),d3.max(dataArray2)]).range([1,15])
     
     // Load GeoJSON data and merge with states data
     d3.json(geoJSON, function(json) {
       // d3.json("geography/europe.json", function(json) {
-
       // Loop through each state data value in the .csv file
       for (var i = 0; i < data.length; i++) {
 
@@ -134,7 +138,7 @@ function generateVis(canvas, config){
         .attr("r", function (d){
           return radius(d.properties.value2)
         })
-        .attr("fill","black")
+        .attr("fill","blue")
         .attr("transform",function(d){
           var p = path.centroid(d); //<-- centroid is the center of the path, projection maps it to pixel positions
           // console.log(p);
@@ -155,6 +159,26 @@ function generateVis(canvas, config){
           div.transition().duration(300)
           .style("opacity", 0);
         });
+
+  // var svg = svg.append("g")
+  // svg
+  //   .on("wheel.zoom",function(){
+  //       var currScale = projection.scale();
+  //       var newScale = currScale - 2*event.deltaY;
+  //       var currTranslate = projection.translate();
+  //       var coords = projection.invert([event.offsetX, event.offsetY]);
+  //       projection.scale(newScale);
+  //       var newPos = projection(coords);
+  //       projection.translate([currTranslate[0] + (event.offsetX - newPos[0]), currTranslate[1] + (event.offsetY - newPos[1])]);
+  //       svg.selectAll("path").attr("d", path);
+  //       // svg.selectAll(".dots").attr("transform", "translate(",20+")")
+  //   })
+  //   .call(d3.drag().on("drag", function(){
+  //       var currTranslate = projection.translate();
+  //       projection.translate([currTranslate[0] + d3.event.dx,
+  //                             currTranslate[1] + d3.event.dy]);
+  //       svg.selectAll("path").attr("d", path);
+  //   }));
 
       
       // add a legend
@@ -221,6 +245,7 @@ function generateVis(canvas, config){
     });
   });
 }
+
 // https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
 String.prototype.toProperCase = function () {
     return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});

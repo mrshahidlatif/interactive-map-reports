@@ -1,5 +1,5 @@
 var allData; 
-var existNeighborsInfo = true;
+var existNeighborsInfo = false;
 //------------------------------
 //Thresold parameters 
 //------------------------------
@@ -25,7 +25,7 @@ function generateNarrative(data,config){
 	}
 
 	var corr = computeCorrelation(allData);
-	console.log(corr); 
+	// console.log(corr); 
 	if(corr > POSITIVE_CORRELATION){
 		text += " On the whole, large number of " + config.indVariable + " are assoicated with large number of " + config.depVariable+ ".";
 	}
@@ -55,6 +55,7 @@ function generateNarrative(data,config){
 	}
 
 	var bivariate_outliers = getDataByFlag(data, "BOL");
+	console.log(bivariate_outliers); 
 	if(bivariate_outliers.length>0){
 		bivariate_outliers.sort(function(a,b){a.v2_v1_ratio - b.v2_v1_ratio});
 		// console.log(bivariate_outliers); 
@@ -414,7 +415,7 @@ function computeSpatialTrends(data,config){
 
   //Computing the orientations of geographical regions 
   var geoRegionCenter; 
-  d3.json("geography/countries/USA.geo.json", function(json) {
+  d3.json(config.geoJSONRegion, function(json) {
      for (var j = 0; j < json.features.length; j++) {
           var stateName = json.features[j].properties.name;
           geoRegionCenter = path.centroid(json.features[j].geometry); 
@@ -422,7 +423,7 @@ function computeSpatialTrends(data,config){
         }
    
     // console.log(geoRegionCenter); 
-    d3.json("us-states.json", function(json) {
+    d3.json(config.geoJSONFile, function(json) {
        for (var j = 0; j < json.features.length; j++) {
             var stateName = json.features[j].properties.name;
             var currentCenter = path.centroid(json.features[j].geometry); 
@@ -517,9 +518,9 @@ function generateSpatialTrendText(e,w,n,s,config){
 	var sia = ListOfObjToArray(s,config.indVariable);
 	var ewns_i_arr = [ss.sum(eia),ss.sum(wia),ss.sum(nia),ss.sum(sia)]; 
 	var max_i = ss.max(ewns_i_arr);
-	console.log(ewns_i_arr); 
+	// console.log(ewns_i_arr); 
 	var max_i_index = ewns_i_arr.indexOf(max_i);
-	console.log(max_i_index); 
+	// console.log(max_i_index); 
 
 	switch (max_i_index) {
 		case 0:
