@@ -3,11 +3,14 @@
 	"geoJSONRegion":"geography/countries/USA.geo.json",
 	"granularity":"states",
 	"regionID" : "id",
-	"indVariable": "storms",
-	"depVariable": "deaths",
+	"indVariable": "pedestrian-fatalities",
+	"depVariable": "bicyclist-fatalities",
 	"unit": "number",
 	"situation": "negative",
-	"year":"2017",
+	"typeDepVariable": "continuous",
+	"typeIndVariable": "continuous",
+	"year":"2008",
 	"geoJSONFile":"us-states.json",
-	"dataFile":"storms-death-data.csv"
+	"dataFile":"traffic-accidents-usa.csv",
+	"causality": "no"
 }

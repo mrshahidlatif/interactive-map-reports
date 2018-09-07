@@ -1,9 +1,13 @@
 var allData; 
-var existNeighborsInfo = false;
+var existNeighborsInfo = true;
+//Description of variables according to their type 
+var vDepDescriptor="";
+var vIndDescriptor="";
+var verb = ""; 
 //------------------------------
 //Thresold parameters 
 //------------------------------
-var POSITIVE_CORRELATION = 0.5;
+var POSITIVE_CORRELATION = 0.4;
 var NEGATIVE_CORRELATION = -0.5;
 //-------------------------------
 
@@ -12,69 +16,157 @@ function generateNarrative(data,config){
 	// console.log(allData);
 	// console.log(config);
 	// console.log(geoOrientationData);
+
+	//verbs 
+	verb = "experience";
+
+	//Description of variables according to their type 
+	if (config.typeDepVariable == "continuous"){
+		vDepDescriptor = " number of "
+	}
+	else if (config.typeDepVariable == "discrete") {
+		vDepDescriptor = " values of "
+	}
+
+	if (config.typeIndVariable == "continuous"){
+		vIndDescriptor = " number of "
+	}
+	else if (config.typeIndVariable == "discrete") {
+		vIndDescriptor = " values of "
+	}
+	
+
 	var text="";
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//First Sentence
-	if (config.unit == "number"){
-		text += "The map visualization shows number of " + config.depVariable + " caused by " + config.indVariable + " in " + config.geoRegion + " during " + config.year + ".";
+	text += "Figure shows variation in "+ vDepDescriptor + config.depVariable ; 
 
+	text += (config.causality== "yes") ? " caused by " : " and "; 
+	text += config.indVariable + " across different "+ config.granularity + " of "  + config.geoRegion + " during " + config.year + ".";
+
+	if(config.causality=="yes"){ //Only print if there is causality in the variables
+		var corr = computeCorrelation(allData);
+		// console.log(corr); 
+		if(corr > POSITIVE_CORRELATION){
+			text += " Overall, large "+ vIndDescriptor + config.indVariable + " are assoicated with large " + vDepDescriptor + config.depVariable+ ".";
+		}
+		else if (corr < NEGATIVE_CORRELATION){
+			text += " Overall, large "+ vIndDescriptor + config.indVariable + " are assoicated with small " + vDepDescriptor + config.depVariable+ ".";
+
+		}
 	}
-	else if (config.unit == "percentage"){
-		text += "The map visualization shows " + config.depVariable + " in proportion to the " + config.indVariable + " in " + config.geoRegion + " during " + config.year + ".";
-	}
-
-	var corr = computeCorrelation(allData);
-	// console.log(corr); 
-	if(corr > POSITIVE_CORRELATION){
-		text += " On the whole, large number of " + config.indVariable + " are assoicated with large number of " + config.depVariable+ ".";
-	}
-	else if (corr < NEGATIVE_CORRELATION){
-		text += " On the whole, large number of " + config.indVariable + " are assoicated with small number of " + config.depVariable+ ".";
-
-	}
-
-	text += " "+ config.depVariable.toProperCase() + " varies from "+ getMin(allData, config.depVariable) + " to " + getMax(allData, config.depVariable) + " across various " + config.granularity + " of " + config.geoRegion + "."; 
-
-	//Spatial trend in values
-	computeSpatialTrends(allData,config); 
-
+	
 	//Univariate Outliers
 	var outliers_v2 = getDataByFlag(data,"MAXV2");
+	var outliers_v1 = getDataByFlag(data, "MAXV1"); 
+
+	//print only if there are ouliers. 
+	if (outliers_v2.length>0 && outliers_v1.length>0){
+		text += vDepDescriptor.capitalize() + config.depVariable + " vary from "+ getMin(allData, config.depVariable) + " to " + getMax(allData, config.depVariable) + " across various " + config.granularity;
+		text += (config.causality=="no") ? ", whereas " + vIndDescriptor + config.indVariable +" ranges between " + getMin(allData, config.indVariable) + " and " + getMax(allData, config.indVariable)+"." : ".";
+	}
+
+	
 	// console.log(outliers_v2);
 	if(outliers_v2.length>0){
 		text += stringifyList_v2(outliers_v2);
+	}
+	else {
+		
+		var minRegion = getRegionWithMinValue(allData, config.depVariable);
+		var maxRegion = getRegionWithMaxValue(allData, config.depVariable);
+		// console.log(minRegion)
+		text += " "+ config.depVariable.toProperCase() + " vary from "+ minRegion[config.depVariable] + " (" + minRegion[config.regionID] + ") " + " to " + maxRegion[config.depVariable] + " (" + maxRegion[config.regionID] + ") " + " across various " + config.granularity + " of " + config.geoRegion + ".";
 	}
 
 	data.sort(function(a,b){return +b[config.indVariable] - +a[config.indVariable]});
 	// console.log(data); 
 
-	var outliers_v1 = getDataByFlag(data, "MAXV1")
+	
 	if(outliers_v1.length>0){
 		text += stringifyList_v1(outliers_v1);
 	}
+	else {
+		var minRegion = getRegionWithMinValue(allData, config.indVariable);
+		var maxRegion = getRegionWithMaxValue(allData, config.indVariable);
+		// console.log(minRegion)
+		text += " Similarly, "+ config.indVariable + " ranges from "+ minRegion[config.indVariable] + " (" + minRegion[config.regionID] + ") " + " to " + maxRegion[config.indVariable] + " (" + maxRegion[config.regionID] + ")." //+ " across various " + config.granularity + " of " + config.geoRegion + ".";
+
+	}
 
 	var bivariate_outliers = getDataByFlag(data, "BOL");
-	console.log(bivariate_outliers); 
+	// console.log(bivariate_outliers); 
 	if(bivariate_outliers.length>0){
-		bivariate_outliers.sort(function(a,b){a.v2_v1_ratio - b.v2_v1_ratio});
-		// console.log(bivariate_outliers); 
-		// text += " Relatively small number of " + config.indVariable + " did huge damage in " + bivariate_outliers[2][config.regionID].toProperCase()+" killing " + bivariate_outliers[2][config.depVariable] + " people in just " + bivariate_outliers[2][config.indVariable] + " " + config.indVariable +".";
+		text += stringifyBivariateOutliers(bivariate_outliers); 
 	}
+
+	//Spatial trend in variables
+	computeSpatialTrends(allData,config); 
 
 	return text; 
 }
+
+function stringifyBivariateOutliers(list){
+	var string = ""; 
+	var max_ratio = getMax(list, "v2_v1_ratio");
+	// console.log(max_ratio);
+	switch (list.length) {
+		case 1:
+			string += " Quite unusual behavior can be observed in " + list[0][config.regionID].toProperCase() +"."; 
+			break;
+		case 2:
+			string += " Quite unusual behavior can be observed in " + list[0][config.regionID].toProperCase() +" and " + list[1][config.regionID].toProperCase()+"."; 
+			break;
+		default:
+			string += " Quite unusual behavior can be observed in ";
+			for(var i=0;i<list.length;i++){
+				if (i==list.length-1){
+					string+= "and "+list[i][config.regionID].toProperCase()+".";
+				}
+				else {
+					string+= list[i][config.regionID].toProperCase() + ", ";
+				}
+			}
+			break;
+	}
+
+	var bo = list.filter(function(d){return d.v2_v1_ratio == max_ratio});
+	// console.log(bo);
+	if(config.causality=="yes"){
+		if(bo.length == 1){
+			string += " In particular, relatively small "+ vIndDescriptor + config.indVariable + " (" + bo[0][config.indVariable]+")" ; 
+			string += " caused very high number of " + config.depVariable + " (" +bo[0][config.depVariable]+") in " + bo[0][config.regionID].toProperCase()+".";
+		}
+	}
+	else {
+		if(bo.length == 1){
+			string += " In particular, " + bo[0][config.regionID].toProperCase() + " shows relatively small "+ vIndDescriptor + config.indVariable + " (" + bo[0][config.indVariable]+")" ; 
+			string += " and a very high number of " + config.depVariable + " (" +bo[0][config.depVariable]+").";
+		}
+	}
+	return string; 
+}
 function stringifyList_v2(list){
+	//TESTED
 	var string="";
 	switch (list.length) {
 		case 1:  
-			string += " Maximum number of " +list[0][config.depVariable] + " " + config.depVariable + " are caused by " + list[0][config.indVariable] + " " + config.indVariable + " in " + list[0][config.regionID].toProperCase() + ".";
+			string += string += (config.situation=="negative") ? " Alarmingly high": "The highest";
+			string += vDepDescriptor + " " + config.depVariable + " (" +list[0][config.depVariable] + ") " + " are recorded in " + list[0][config.regionID].toProperCase();
+			string += (config.causality == "yes") ? " as a result of "+ list[0][config.depVariable] + " " + config.indVariable+"." : ".";
 			break;
 		case 2:
-			string += string += " Maximum number of " +list[0][config.depVariable] + " " + config.depVariable + " are caused by " + list[0][config.indVariable] + " " + config.indVariable + " in " + list[0][config.regionID].toProperCase() + " followed by "+list[1][config.regionID] +", where "+list[1][config.indVariable]+" "+config.indVariable + " caused "+list[1][config.depVariable] + " "+ config.depVariable+ ".";
+			string += " " + list[0][config.regionID].toProperCase() + getVerb("s", "past", verb);
+			string += (config.situation=="negative") ? " alarmingly high": "the highest";
+			string += vDepDescriptor + config.depVariable + " (" +list[0][config.depVariable] + ")" ;
+			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable + " followed by " : " followed by "; 
+			string += (config.causality == "yes") ? list[1][config.regionID].toProperCase() + " where "+ list[1][config.indVariable]+ " "+ config.indVariable + " caused " + list[1][config.depVariable]+ " " + config.depVariable+ "." : list[1][config.regionID].toProperCase() + " (" +list[1][config.depVariable]+ ").";
 			break;
 		default:
-			string += " Maximum number of " +list[0][config.depVariable] + " " + config.depVariable + " are caused by " + list[0][config.indVariable] + " " + config.indVariable + " in " + list[0][config.regionID].toProperCase() + " followed by ";
+			string += " " + list[0][config.regionID].toProperCase() + getVerb("s", "past", verb);
+			string += (config.situation=="negative") ? " alarmingly high": "the highest";
+			string += vDepDescriptor + config.depVariable + " (" +list[0][config.depVariable] + ") followed by ";
 			for(i=1;i<list.length;i++){
 				if(i < list.length -1)
 					string += list[i][config.regionID].toProperCase() + " (" +list[i][config.depVariable]+ ")" + ", ";
@@ -89,13 +181,13 @@ function stringifyList_v1(list){
 	var string="";
 	switch (list.length) {
 		case 1:
-			string += " Maximum number of " +list[0][config.indVariable] + " " + config.indVariable + " are experienced " + " in " + list[0][config.regionID].toProperCase() + " causing " + list[0][config.depVariable] + " " + config.depVariable +".";
+			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() + "."; 
 			break;
 		case 2:
-			string += " Maximum number of " +list[0][config.indVariable] + " " + config.indVariable + " are experienced " + " in " + list[0][config.regionID].toProperCase() + " causing " + list[0][config.depVariable] + " " + config.depVariable +" followed by "+list[1][config.regionID] +", where "+list[1][config.indVariable]+" "+config.indVariable + " caused "+list[1][config.depVariable] + " "+ config.depVariable+ ".";
+			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() +" followed by "+ list[1][config.regionID].toProperCase() + " (" + list[0][config.indVariable] + ") ";
 			break;
 		default:
-			string += " Maximum number of " +list[0][config.indVariable] + " " + config.indVariable + " are experienced " + " in " + list[0][config.regionID].toProperCase() + " causing " + list[0][config.depVariable] + " " + config.depVariable +" followed by ";
+			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() +" followed by ";
 			for(i=1;i<list.length;i++){
 				if(i < list.length -1)
 					string += list[i][config.regionID].toProperCase() + " (" +list[i][config.indVariable]+ ")" + ", ";
@@ -290,6 +382,18 @@ function getMin(data, variable){
 }
 function getMax(data, variable){
 	return d3.max(data, function(d){return +d[variable];});
+}
+
+function getRegionWithMinValue(data, variable){
+	var min = d3.min(data, function(d){return +d[variable];});
+	return data.filter(function(d){return d[variable] == min})[0];
+
+}
+
+function getRegionWithMaxValue(data, variable){
+	var max =  d3.max(data, function(d){return +d[variable];});
+	return data.filter(function(d){return d[variable] == max})[0];
+
 }
 function getAverage(data, variable){
 	var arr= [];
@@ -496,7 +600,7 @@ function generateSpatialTrendText(e,w,n,s,config){
 
 	switch (max_d_index) {
 		case 0:
-			text += " Eastern "+ config.granularity + " show more " + config.depVariable ; 
+			text += " Eastern "+ config.granularity + " show more " +  + config.depVariable ; 
 			break;
 		case 1:
 			text += " Western "+ config.granularity + " show more " + config.depVariable ; 
@@ -567,28 +671,33 @@ function generateSpatialTrendText(e,w,n,s,config){
 			neg_corr_arr.push(i);
 		}
 	}
-	// console.log(corr_arr);
-	var directions = ["Easter", "Western", "Northern", "Southern"];
+	console.log(pos_corr_arr);
+	var directions = ["Eastern", "Western", "Northern", "Southern"];
 	if(pos_corr_arr.length>0){
-		text += " Positive correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
+		text += " Strong positive correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
 		if(pos_corr_arr.length==1)
 			text += directions[pos_corr_arr[0]] + config.granularity;
 		else if(pos_corr_arr.length==2)
 			text += directions[pos_corr_arr[0]] + " and " + directions[pos_corr_arr[1]] + " " + config.granularity;
 		for(var i=0;i<pos_corr_arr.length; i++){
-			
+			if (i==pos_corr_arr.length-1){
+				text+= "and "+directions[pos_corr_arr[i]] + " "+ config.granularity;
+			}
+			else {
+				text+= directions[pos_corr_arr[i]]+ ", ";
+			}
 		}
 		 
 	}
 
 	if(neg_corr_arr.length>0){
 		text += " Negative correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
-		if(pos_corr_arr.length==1)
+		if(neg_corr_arr.length==1)
 			text += directions[pos_corr_arr[0]] + config.granularity;
-		else if(pos_corr_arr.length==2)
-			text += directions[pos_corr_arr[0]] + " and " + directions[pos_corr_arr[1]] + " " + config.granularity;
-		for(var i=0;i<pos_corr_arr.length; i++){
-			
+		else if(neg_corr_arr.length==2)
+			text += directions[neg_corr_arr[0]] + " and " + directions[neg_corr_arr[1]] + " " + config.granularity;
+		for(var i=0;i<neg_corr_arr.length; i++){
+			text += "";
 		} 
 	}
 	return text + "."; 
@@ -637,4 +746,11 @@ function getTopNItems(items, minN, maxN) {
   // console.log(finaltopItems); 
 
   return finaltopItems;
+}
+function getVerb(sub, time, verb){
+	//sub = s, p, 
+	// time = present, past, 
+
+	return " " + verb + "d "; 
+
 }

@@ -8,11 +8,27 @@ function generateVis(canvas, config){
   //Width and height of map
   // console.log(config.geoJSONFile); 
 
+  //Color Scheme
+  switch (config.situation) {
+    case "positive":
+        var dotColor = '#0a68ff'
+        var lowColor = '#f9f9f9'
+        var highColor = '#16ad1b'
+      break;
+    case "negative":
+        var dotColor = '#f44242'
+        var lowColor = '#33ccff'
+        var highColor = '#ff99cc'
+    default:
+      // statements_def
+      break;
+  }
+
+
   var geoJSON = config.geoJSONFile; 
   var dataFile = config.dataFile;  
 
-  var lowColor = '#f9f9f9'
-  var highColor = '#16ad1b'
+  
   var margin = {top: 0, right: 10, bottom: 30, left: 10};
   var width = 650 -margin.left-margin.right;
   var height = 550-margin.top - margin.bottom;
@@ -138,7 +154,7 @@ function generateVis(canvas, config){
         .attr("r", function (d){
           return radius(d.properties.value2)
         })
-        .attr("fill","blue")
+        .attr("fill",dotColor)
         .attr("transform",function(d){
           var p = path.centroid(d); //<-- centroid is the center of the path, projection maps it to pixel positions
           // console.log(p);
@@ -231,6 +247,7 @@ function generateVis(canvas, config){
 
       key.append("circle")
         .attr("class", "dots")
+        .attr("fill", dotColor)
         .attr("cx",width/2 + 30 )
         .attr("cy",height-48)
         .attr("r",10)
@@ -239,7 +256,7 @@ function generateVis(canvas, config){
         .attr("class", "legend-text")
         .attr("x",width/2 + 43 )
         .attr("y",height-44)
-        .text("No. of deaths")
+        .text(config.depVariable.toProperCase())
 
 
     });
@@ -257,7 +274,13 @@ function getTextWidth(text, fontSize, fontFace) {
     context.font = fontSize + 'px ' + fontFace;
     return context.measureText(text).width;
 }
-
+String.prototype.capitalize = function() {
+    if (this.charAt(0) == " "){
+      return " " + this.charAt(1).toUpperCase() + this.slice(2);
+    }
+    else 
+      return this.charAt(0).toUpperCase() + this.slice(1);
+}
 //labelling the regions with North, South, East, and West 
 // function getOrientations(path){
 //   var geoRegionCenter; 

@@ -78,7 +78,7 @@ a:hover{
 
 .leftcolumnHeader {
     float: left;
-    width: 65%; 
+    width: 55%; 
     height: 100%;
     padding-top: 10px;
     padding-left: 10px;
@@ -88,7 +88,7 @@ a:hover{
 }
 .rightcolumnHeader {
     float: left;
-    width: 30%;
+    width: 40%;
     padding-top: 10px;
     padding-left: 10px;
 
@@ -97,13 +97,14 @@ a:hover{
 .row{
     width: 1090px;
     margin: 0 auto;
+    overflow: auto;
 /*    background-color: #66ffff;*/
 }
 /* Left column */
 .leftcolumn { 
     /*margin-left: 200px; */
     float: left;
-    width: 65%; 
+    width: 55%; 
     padding-top: 20px;
     padding-left: 10px;
     padding-right: 20px;
@@ -113,13 +114,12 @@ a:hover{
 .rightcolumn {
     /*margin-right: 200px;*/
     float: left;
-    width: 35%;
+    width: 40%;
     /*background-color: #f1f1f1;*/
     padding-top: 20px;
     padding-left: 20px;
     /*padding-right: 150px;*/
     /*max-height: 1000px;*/
-    overflow-y: auto;
 
 }
 /* Clear floats after the columns */
@@ -185,7 +185,7 @@ a:hover{
   top:30px;
 }
 .dots{
-  fill: #f44242;
+  /*fill: #f44242;*/
   opacity: 0.8;
 }
 
