@@ -1,5 +1,5 @@
 var allData; 
-var existNeighborsInfo = true;
+var existNeighborsInfo = false;
 //Description of variables according to their type 
 var vDepDescriptor="";
 var vIndDescriptor="";
@@ -16,7 +16,6 @@ function generateNarrative(data,config){
 	// console.log(allData);
 	// console.log(config);
 	// console.log(geoOrientationData);
-
 	//verbs 
 	verb = "experience";
 
@@ -34,7 +33,6 @@ function generateNarrative(data,config){
 	else if (config.typeIndVariable == "discrete") {
 		vIndDescriptor = " values of "
 	}
-	
 
 	var text="";
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
@@ -69,7 +67,7 @@ function generateNarrative(data,config){
 
 	
 	// console.log(outliers_v2);
-	if(outliers_v2.length>0){
+	if(outliers_v2.length>0){  
 		text += stringifyList_v2(outliers_v2);
 	}
 	else {
@@ -100,6 +98,23 @@ function generateNarrative(data,config){
 	if(bivariate_outliers.length>0){
 		text += stringifyBivariateOutliers(bivariate_outliers); 
 	}
+
+
+	//Odd on out - regions showing different behavior compared to their neighbors 
+
+	// if(existNeighborsInfo){
+	// 	var neighbors = geo_neighbors[name.toProperCase()].split(",");
+	// 	var neighbor_objects = getObjectsByNames(allData, neighbors);
+	// 	var arrOfNeighborValues = ListOfObjToArray(neighbor_objects, [config.depVariable]);
+
+	// 	// console.log(arrOfNeighborValues); 
+
+	// 	if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])){
+	// 		exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
+	// 		exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
+
+	// 	}
+	// }
 
 	//Spatial trend in variables
 	computeSpatialTrends(allData,config); 
@@ -216,31 +231,31 @@ function explainOnDemand(name,config){
 
 	//Based on dependant variable
 	if(value_dV == getMin(allData,config.depVariable)) {
-		exp += name.toProperCase() + " has " ;
-		exp += (value_dV==0) ? "no " : "the least number of (" + value_dV+") ";
+		exp += name.toProperCase() + getVerb("s","past",verb) ;
+		exp += (value_dV==0) ? "no " : "the lowest" + vDepDescriptor + " (" + value_dV+") ";
 		exp += config.depVariable; 
 	}
 	else if(value_dV == getMax(allData,config.depVariable)) {
-		exp += name.toProperCase() + " has " ;
-		exp += (value_dV==0) ? "no " : "the most number of (" + value_dV+") ";
+		exp += name.toProperCase() + getVerb("s","past",verb) ;
+		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor + " (" + value_dV+") ";
 		exp += config.depVariable; 
 	}
 	else if(value_dV > avg_dV){
-		exp += name.toProperCase() + " has above average number of (" + value_dV + ") "+ config.depVariable;
+		exp += name.toProperCase() + getVerb("s","past",verb) + " above average number of (" + value_dV + ") "+ config.depVariable;
 	}
 	else if (value_dV < avg_dV){
-		exp += name.toProperCase() + " has below average number of (" + value_dV + ") " + config.depVariable;
+		exp += name.toProperCase() + getVerb("s","past",verb) + " below average number of (" + value_dV + ") " + config.depVariable;
 	}
 
 	//Based on independant variable
 	if(value_iV == getMin(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "the least number of (" + value_iV+") ";
+		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + " (" + value_iV+") ";
 		exp += config.indVariable; 
 	}
 	else if(value_iV == getMax(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "the most number of (" + value_iV+") ";
+		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + "(" + value_iV+") ";
 		exp += config.indVariable; 
 	}
 	else if(value_iV > avg_iV){
@@ -264,12 +279,18 @@ function explainOnDemand(name,config){
 
 		// console.log(arrOfNeighborValues); 
 
-		if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])){
-			exp += " Compared to it's neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase() + " shows more " + config.depVariable + ".";
+		if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="upper"){
+			exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
+			exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
 
 		}
+		else {
+			exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
+			exp += getVerb("s","past", verb) ;
+			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
+			exp += config.depVariable + ".";
+		}
 	}
-
 
 	document.getElementById("eod").innerHTML = exp;
 }
@@ -342,10 +363,10 @@ function isOutlierAmongNeighbors(neighbors, p){
 	// console.log(p + ": "+ (thirdQ+IQR) );
 	// console.log(p + ": "+ (firstQ-IQR) );
 	if(p > thirdQ+IQR){
-		return true;
+		return "upper";
 	}
 	if(p < firstQ-IQR){
-		return true; 
+		return "lower"; 
 	}
 
 }
@@ -511,194 +532,161 @@ function Create2DArray(rows) {
 }
 function computeSpatialTrends(data,config){
   var text="";
-  var geoOrientationData=[];
-  var easternRegions = [];
-  var westernRegions = [];
-  var southernRegions = [];
-  var northernRegions = [];
+  var distinctRegions = [];
 
-  //Computing the orientations of geographical regions 
-  var geoRegionCenter; 
-  d3.json(config.geoJSONRegion, function(json) {
-     for (var j = 0; j < json.features.length; j++) {
-          var stateName = json.features[j].properties.name;
-          geoRegionCenter = path.centroid(json.features[j].geometry); 
-          //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
-        }
-   
-    // console.log(geoRegionCenter); 
-    d3.json(config.geoJSONFile, function(json) {
-       for (var j = 0; j < json.features.length; j++) {
-            var stateName = json.features[j].properties.name;
-            var currentCenter = path.centroid(json.features[j].geometry); 
-            //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
-            if(currentCenter[1]<geoRegionCenter[1]){
-              var o = new Object();
-              o["regionName"] = stateName;
-              o["orientation"] = "North"
-              geoOrientationData.push(o);
-              // console.log( stateName + " : " + "North"); 
-            }
-            else {
-              var o = new Object();
-              o["regionName"] = stateName;
-              o["orientation"] = "South"
-              geoOrientationData.push(o);
-              // console.log( stateName + " : " + "South");
-            }
-            if(currentCenter[0]<geoRegionCenter[0]){
-                var o = new Object();
-              o["regionName"] = stateName;
-              o["orientation"] = "West"
-              geoOrientationData.push(o);
-              // console.log( stateName + " : " + "West"); 
-            }
-            else {
-              var o = new Object();
-              o["regionName"] = stateName;
-              o["orientation"] = "East"
-              geoOrientationData.push(o);
-              
-            }
-          }
+  for (var i = 0; i < allData.length; i++) {
+  	 var id = allData[i][config.regionID].toProperCase(); 
+     if (distinctRegions.indexOf(regions[id])==-1 && regions[id] != undefined)
+	    distinctRegions.push(regions[id]);
+  }
 
-		for(var i=0;i<data.length;i++){
-			for(var j=0;j<geoOrientationData.length;j++){
-				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "East"){
-					easternRegions.push(data[i]); 
-				}
-				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "West"){
-					westernRegions.push(data[i]); 
-				}
-				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "North"){
-					northernRegions.push(data[i]); 
-				}
-				if(data[i][config.regionID].toProperCase() == geoOrientationData[j].regionName && geoOrientationData[j].orientation == "South"){
-					southernRegions.push(data[i]); 
-				}
-			}
-		}
-		 text += generateSpatialTrendText(easternRegions,westernRegions,northernRegions,southernRegions, config);
-		 document.getElementById("strend").innerHTML = text ; 
+  var regionGroups = new Array(distinctRegions.length);
+
+	for (var i = 0; i < regionGroups.length; i++) {
+	  regionGroups[i] = new Array();
+	}
+
+	// console.log(distinctRegions);
+
+  for (var i=0;i<distinctRegions.length;i++){
+  	 for (var j = 0; j < allData.length; j++) {
+	  	 var id = allData[j][config.regionID].toProperCase(); 
+	     if(regions[id]==distinctRegions[i]){
+	     	regionGroups[i].push(id); 
+	     }
+	 }
+  }
+  
+  text += generateSpatialTrendText(distinctRegions, regionGroups, config);
+  document.getElementById("strend").innerHTML = text ; 
 		 
-    });
-  });
- 
 } 
-function generateSpatialTrendText(e,w,n,s,config){
+function generateSpatialTrendText(dRs,rGs, config){
 	var text = "";
+	console.log(dRs);
+	console.log(rGs);
+	// getObjectsByNames(allData,rGs[0]);
 
-	var eda = ListOfObjToArray(e,config.depVariable);
-	var wda = ListOfObjToArray(w,config.depVariable);
-	var nda = ListOfObjToArray(n,config.depVariable);
-	var sda = ListOfObjToArray(s,config.depVariable);
-	var ewns_arr = [ss.sum(eda),ss.sum(wda),ss.sum(nda),ss.sum(sda)]; 
-	var max_d = ss.max(ewns_arr);
+	var regionsGroupSums_dV = [] ; 
+	for (var i=0;i<rGs.length;i++){
+		var objs = getObjectsByNames(allData,rGs[i]);
+		regionsGroupSums_dV[i] = ss.sum(ListOfObjToArray(objs,config.depVariable));
+	}
+	// console.log(regionsGroupSums_dV);
+
+	var max_d = ss.max(regionsGroupSums_dV);
 	// console.log(max_d); 
-	var max_d_index = ewns_arr.indexOf(max_d);
+	var max_d_index = regionsGroupSums_dV.indexOf(max_d);
 	// console.log(max_d_index);
 
 	switch (max_d_index) {
 		case 0:
-			text += " Eastern "+ config.granularity + " show more " +  + config.depVariable ; 
+			text += dRs[0] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 			break;
 		case 1:
-			text += " Western "+ config.granularity + " show more " + config.depVariable ; 
+			text += dRs[1] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 			break;
 		case 2:
-			text += " Northern "+ config.granularity + " show more " + config.depVariable ; 
+			text += dRs[2] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 			break;
 		case 3:
-			text += " Southern "+ config.granularity + " show more " + config.depVariable ; 
+			text += dRs[3] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 			break;
 	}
 	// console.log(text);
 
 	text +=  ", whereas ";
 
-	var eia = ListOfObjToArray(e,config.indVariable);
-	var wia = ListOfObjToArray(w,config.indVariable);
-	var nia = ListOfObjToArray(n,config.indVariable);
-	var sia = ListOfObjToArray(s,config.indVariable);
-	var ewns_i_arr = [ss.sum(eia),ss.sum(wia),ss.sum(nia),ss.sum(sia)]; 
-	var max_i = ss.max(ewns_i_arr);
-	// console.log(ewns_i_arr); 
-	var max_i_index = ewns_i_arr.indexOf(max_i);
-	// console.log(max_i_index); 
+	var regionsGroupSums_iV = [] ; 
+	for (var i=0;i<rGs.length;i++){
+		var objs = getObjectsByNames(allData,rGs[i]);
+		regionsGroupSums_iV[i] = ss.sum(ListOfObjToArray(objs,config.indVariable));
+	}
+	console.log(regionsGroupSums_iV);
+
+	var max_i = ss.max(regionsGroupSums_iV);
+	// console.log(max_i); 
+	var max_i_index = regionsGroupSums_iV.indexOf(max_i);
+	// console.log(max_i_index);
 
 	switch (max_i_index) {
 		case 0:
-			text += " Eastern "+ config.granularity + " show more " + config.indVariable ; 
+			text += dRs[0] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ; 
 			if(max_d_index == 0){
-				text = " Eastern "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				text = dRs[0] + " " + config.granularity + " show higher " + vDepDescriptor +  config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
 			}
 			break;
 		case 1:
-			text += " Western "+ config.granularity + " show more " + config.indVariable ;
+			text += dRs[1] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
 			if(max_d_index == 1){
-				text = " Western "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				text = dRs[1] + " " + config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
 			} 
 			break;
 		case 2:
-			text += " Northern "+ config.granularity + " show more " + config.indVariable ;
+			text += dRs[2] + " "+ config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor +config.indVariable ;
 			if(max_d_index == 2){
-				text = " Northern "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				text = dRs[2] + " "+ config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
 			}
 			break;
 		case 3:
-			text += " Southern "+ config.granularity + " show more " + config.indVariable ;
+			text += dRs[3] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
 			if(max_d_index == 3){
-				text = " Southern "+ config.granularity + " show higher " + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				text = dRs[3] + " "+ config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
 			}
 			break;
 	}
 	text += ".";
 
 	//Correlations among regions 
-	var corr_e = ss.sampleCorrelation(eda, eia);
-	var corr_w = ss.sampleCorrelation(wda, wia);
-	var corr_n = ss.sampleCorrelation(nda, nia);
-	var corr_s = ss.sampleCorrelation(sda, sia);
-	var corr_arr = [corr_e, corr_w, corr_n, corr_s]; 
+	var corr_arr = [] ; 
+	for (var i=0;i<rGs.length;i++){
+		var objs = getObjectsByNames(allData,rGs[i]);
+		corr_arr[i] = ss.sampleCorrelation(ListOfObjToArray(objs,config.depVariable), ListOfObjToArray(objs,config.indVariable));
+	}
+	console.log(corr_arr);
+
 	var pos_corr_arr = []; 
 	var neg_corr_arr = [];
 
 	 for(var i=0;i<corr_arr.length;i++){
-		if(corr_arr[i] > POSITIVE_CORRELATION){
+		if(corr_arr[i] > 0.75){
 			pos_corr_arr.push(i);
 		}
-		if(corr_arr[i] < NEGATIVE_CORRELATION){
+		if(corr_arr[i] < -0.75){
 			neg_corr_arr.push(i);
 		}
 	}
 	console.log(pos_corr_arr);
-	var directions = ["Eastern", "Western", "Northern", "Southern"];
+	console.log(dRs[pos_corr_arr[0]])
+	
 	if(pos_corr_arr.length>0){
 		text += " Strong positive correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
 		if(pos_corr_arr.length==1)
-			text += directions[pos_corr_arr[0]] + config.granularity;
+			text += dRs[pos_corr_arr[0]] + " " +  config.granularity;
 		else if(pos_corr_arr.length==2)
-			text += directions[pos_corr_arr[0]] + " and " + directions[pos_corr_arr[1]] + " " + config.granularity;
-		for(var i=0;i<pos_corr_arr.length; i++){
-			if (i==pos_corr_arr.length-1){
-				text+= "and "+directions[pos_corr_arr[i]] + " "+ config.granularity;
-			}
-			else {
-				text+= directions[pos_corr_arr[i]]+ ", ";
-			}
-		}
+			text += dRs[pos_corr_arr[0]] + " and " + dRs[pos_corr_arr[1]] + " " + config.granularity;
+		// else {
+		// 	for(var i=0;i<pos_corr_arr.length; i++){
+		// 		if (i==pos_corr_arr.length-1){
+		// 			text+= "and "+dRs[pos_corr_arr[i]] + " "+ config.granularity;
+		// 		}
+		// 		else {
+		// 			text+= dRs[pos_corr_arr[i]]+ ", ";
+		// 		}
+		// 	}
+		// }
 		 
 	}
 
 	if(neg_corr_arr.length>0){
 		text += " Negative correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
 		if(neg_corr_arr.length==1)
-			text += directions[pos_corr_arr[0]] + config.granularity;
+			text += dRs[pos_corr_arr[0]] + config.granularity;
 		else if(neg_corr_arr.length==2)
-			text += directions[neg_corr_arr[0]] + " and " + directions[neg_corr_arr[1]] + " " + config.granularity;
-		for(var i=0;i<neg_corr_arr.length; i++){
-			text += "";
-		} 
+			text += dRs[neg_corr_arr[0]] + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity;
+		// for(var i=0;i<neg_corr_arr.length; i++){
+		// 	text += "";
+		// } 
 	}
 	return text + "."; 
 }

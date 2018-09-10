@@ -1,0 +1,53 @@
+For USA - storms-death
+-------
+{
+	"geoRegion": "the United States of America",
+	"geoJSONRegion":"geography/countries/USA.geo.json",
+	"granularity":"states",
+	"regionID" : "id",
+	"indVariable": "storms",
+	"depVariable": "deaths",
+	"unit": "number",
+	"situation": "negative",
+	"typeDepVariable": "continuous",
+	"typeIndVariable": "continuous",
+	"year":"2017",
+	"geoJSONFile":"us-states.json",
+	"dataFile":"storms-death-data.csv",
+	"causality": "no"
+}
+For USA - accidents 
+{
+	"geoRegion": "the United States of America",
+	"geoJSONRegion":"geography/countries/USA.geo.json",
+	"granularity":"states",
+	"regionID" : "id",
+	"indVariable": "pedestrian-fatalities",
+	"depVariable": "bicyclist-fatalities",
+	"unit": "number",
+	"situation": "negative",
+	"typeDepVariable": "continuous",
+	"typeIndVariable": "continuous",
+	"year":"2008",
+	"geoJSONFile":"us-states.json",
+	"dataFile":"traffic-accidents-usa.csv",
+	"causality": "no"
+}
+
+For Europe
+-----------
+
+{
+	"geoRegion": "Europe",
+	"geoJSONRegion":"geography/countries/POL.geo.json",
+	"granularity":"countries",
+	"regionID" : "id",
+	"indVariable": "health_expenditure",
+	"depVariable": "life_expectancy",
+	"typeDepVariable": "discrete",
+	"typeIndVariable": "discrete",
+	"situation": "positive",
+	"year":"2018",
+	"geoJSONFile":"geography/europe.json",
+	"dataFile":"health-life-expectancy.csv"
+}
