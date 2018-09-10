@@ -51,3 +51,20 @@ For Europe
 	"geoJSONFile":"geography/europe.json",
 	"dataFile":"health-life-expectancy.csv"
 }
+
+Stork example 
+-------------
+{
+	"geoRegion": "Europe",
+	"geoJSONRegion":"geography/countries/POL.geo.json",
+	"granularity":"countries",
+	"regionID" : "id",
+	"indVariable": "health_expenditure",
+	"depVariable": "life_expectancy",
+	"typeDepVariable": "discrete",
+	"typeIndVariable": "discrete",
+	"situation": "neutral",
+	"year":"2018",
+	"geoJSONFile":"geography/europe.json",
+	"dataFile":"storks-birth-data.csv"
+}

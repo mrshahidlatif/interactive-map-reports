@@ -13,9 +13,14 @@ var NEGATIVE_CORRELATION = -0.5;
 
 function generateNarrative(data,config){
 
-	// console.log(allData);
-	// console.log(config);
+	console.log(allData);
+	console.log(config);
+	console.log(data);
 	// console.log(geoOrientationData);
+	
+	//Adding title to the report
+	document.getElementById("reportTitle").innerHTML = config.depVariable.toProperCase() + " and " + config.indVariable + ", "+ config.geoRegion + " ("+ config.year+")"; 
+
 	//verbs 
 	verb = "experience";
 
@@ -125,7 +130,8 @@ function generateNarrative(data,config){
 function stringifyBivariateOutliers(list){
 	var string = ""; 
 	var max_ratio = getMax(list, "v2_v1_ratio");
-	// console.log(max_ratio);
+	console.log(list); 
+	console.log(max_ratio);
 	switch (list.length) {
 		case 1:
 			string += " Quite unusual behavior can be observed in " + list[0][config.regionID].toProperCase() +"."; 
@@ -167,9 +173,9 @@ function stringifyList_v2(list){
 	var string="";
 	switch (list.length) {
 		case 1:  
-			string += string += (config.situation=="negative") ? " Alarmingly high": "The highest";
+			string += string += (config.situation=="negative") ? " Alarmingly high": " The highest";
 			string += vDepDescriptor + " " + config.depVariable + " (" +list[0][config.depVariable] + ") " + " are recorded in " + list[0][config.regionID].toProperCase();
-			string += (config.causality == "yes") ? " as a result of "+ list[0][config.depVariable] + " " + config.indVariable+"." : ".";
+			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable+"." : ".";
 			break;
 		case 2:
 			string += " " + list[0][config.regionID].toProperCase() + getVerb("s", "past", verb);
@@ -193,13 +199,14 @@ function stringifyList_v2(list){
 	return string; 
 }
 function stringifyList_v1(list){
+	console.log(list)
 	var string="";
 	switch (list.length) {
 		case 1:
 			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() + "."; 
 			break;
 		case 2:
-			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() +" followed by "+ list[1][config.regionID].toProperCase() + " (" + list[0][config.indVariable] + ") ";
+			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() +" followed by "+ list[1][config.regionID].toProperCase() + " (" + list[1][config.indVariable] + ").";
 			break;
 		default:
 			string += " Similarly, maximum number of " + config.indVariable + " (" + list[0][config.indVariable] + ") " + " are observed " + " in " + list[0][config.regionID].toProperCase() +" followed by ";
@@ -573,25 +580,26 @@ function generateSpatialTrendText(dRs,rGs, config){
 		regionsGroupSums_dV[i] = ss.sum(ListOfObjToArray(objs,config.depVariable));
 	}
 	// console.log(regionsGroupSums_dV);
+	if (regionsGroupSums_dV.length > 0){
+		var max_d = ss.max(regionsGroupSums_dV);
+		// console.log(max_d); 
+		var max_d_index = regionsGroupSums_dV.indexOf(max_d);
+		// console.log(max_d_index);
 
-	var max_d = ss.max(regionsGroupSums_dV);
-	// console.log(max_d); 
-	var max_d_index = regionsGroupSums_dV.indexOf(max_d);
-	// console.log(max_d_index);
-
-	switch (max_d_index) {
-		case 0:
-			text += dRs[0] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
-			break;
-		case 1:
-			text += dRs[1] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
-			break;
-		case 2:
-			text += dRs[2] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
-			break;
-		case 3:
-			text += dRs[3] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
-			break;
+		switch (max_d_index) {
+			case 0:
+				text += dRs[0] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				break;
+			case 1:
+				text += dRs[1] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				break;
+			case 2:
+				text += dRs[2] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				break;
+			case 3:
+				text += dRs[3] + " " + config.granularity + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				break;
+		}
 	}
 	// console.log(text);
 
@@ -604,36 +612,39 @@ function generateSpatialTrendText(dRs,rGs, config){
 	}
 	console.log(regionsGroupSums_iV);
 
-	var max_i = ss.max(regionsGroupSums_iV);
-	// console.log(max_i); 
-	var max_i_index = regionsGroupSums_iV.indexOf(max_i);
-	// console.log(max_i_index);
+	if (regionsGroupSums_iV.length > 0){
 
-	switch (max_i_index) {
-		case 0:
-			text += dRs[0] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ; 
-			if(max_d_index == 0){
-				text = dRs[0] + " " + config.granularity + " show higher " + vDepDescriptor +  config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
-			}
-			break;
-		case 1:
-			text += dRs[1] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
-			if(max_d_index == 1){
-				text = dRs[1] + " " + config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
-			} 
-			break;
-		case 2:
-			text += dRs[2] + " "+ config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor +config.indVariable ;
-			if(max_d_index == 2){
-				text = dRs[2] + " "+ config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
-			}
-			break;
-		case 3:
-			text += dRs[3] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
-			if(max_d_index == 3){
-				text = dRs[3] + " "+ config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
-			}
-			break;
+		var max_i = ss.max(regionsGroupSums_iV);
+		// console.log(max_i); 
+		var max_i_index = regionsGroupSums_iV.indexOf(max_i);
+		// console.log(max_i_index);
+
+		switch (max_i_index) {
+			case 0:
+				text += dRs[0] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ; 
+				if(max_d_index == 0){
+					text = dRs[0] + " " + config.granularity + " show higher " + vDepDescriptor +  config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				}
+				break;
+			case 1:
+				text += dRs[1] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
+				if(max_d_index == 1){
+					text = dRs[1] + " " + config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				} 
+				break;
+			case 2:
+				text += dRs[2] + " "+ config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor +config.indVariable ;
+				if(max_d_index == 2){
+					text = dRs[2] + " "+ config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				}
+				break;
+			case 3:
+				text += dRs[3] + " " + config.granularity + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
+				if(max_d_index == 3){
+					text = dRs[3] + " "+ config.granularity + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the rest of the "+ config.granularity; 
+				}
+				break;
+		}
 	}
 	text += ".";
 
@@ -641,7 +652,8 @@ function generateSpatialTrendText(dRs,rGs, config){
 	var corr_arr = [] ; 
 	for (var i=0;i<rGs.length;i++){
 		var objs = getObjectsByNames(allData,rGs[i]);
-		corr_arr[i] = ss.sampleCorrelation(ListOfObjToArray(objs,config.depVariable), ListOfObjToArray(objs,config.indVariable));
+		if (objs.length >2)
+			corr_arr[i] = ss.sampleCorrelation(ListOfObjToArray(objs,config.depVariable), ListOfObjToArray(objs,config.indVariable));
 	}
 	console.log(corr_arr);
 

@@ -1,16 +1,14 @@
 {
-	"geoRegion": "the United States of America",
-	"geoJSONRegion":"geography/countries/USA.geo.json",
-	"granularity":"states",
-	"regionID" : "id",
-	"indVariable": "storms",
-	"depVariable": "deaths",
-	"unit": "number",
-	"situation": "negative",
-	"typeDepVariable": "continuous",
+	"geoRegion": "Europe",
+	"granularity":"countries",
+	"regionID" : "Country",
+	"indVariable": "Storks",
+	"depVariable": "Birth-rate",
+	"typeDepVariable": "discrete",
 	"typeIndVariable": "continuous",
-	"year":"2017",
-	"geoJSONFile":"us-states.json",
-	"dataFile":"storms-death-data.csv",
-	"causality": "no"
+	"situation": "positive",
+	"year":"1990",
+	"geoJSONFile":"geography/europe.json",
+	"dataFile":"storks-birth-data.csv",
+	"causality":"no"
 }
