@@ -1,6 +1,6 @@
 
-html {
-  overflow: auto;
+body {
+  /*overflow: auto;*/
 }
 @font-face {
     font-family: 'Segoe UI';
@@ -42,10 +42,12 @@ hr{
 }
 .header {
     position: fixed;
+    color: black;
     top: 0;
-    z-index: 11;
+    z-index: 22;
     height: 65px;
     width: 100%;
+    background-color: white;
 }
 
 body
@@ -174,7 +176,7 @@ a:hover{
     line-height: 5px;  
     font-size: 08pt;
     border-top: 1px solid gray;
-    background-color: white
+    background-color: white;
 }
 
 * {

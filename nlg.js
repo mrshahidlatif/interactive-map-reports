@@ -1,5 +1,5 @@
 var allData; 
-var existNeighborsInfo = false;
+var existNeighborsInfo = true;
 //Description of variables according to their type 
 var vDepDescriptor="";
 var vIndDescriptor="";
@@ -17,6 +17,12 @@ function generateNarrative(data,config){
 	console.log(config);
 	console.log(data);
 	// console.log(geoOrientationData);
+	var minVal = getMin(allData, config.indVariable);
+	var maxVal = getMax(allData, config.indVariable);
+	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor]);
+
+	console.log(ramp(200));
+	console.log(dotColor);
 	
 	//Adding title to the report
 	document.getElementById("reportTitle").innerHTML = config.depVariable.toProperCase() + " and " + config.indVariable + ", "+ config.geoRegion + " ("+ config.year+")"; 
@@ -43,7 +49,7 @@ function generateNarrative(data,config){
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//First Sentence
-	text += "Figure shows variation in "+ vDepDescriptor + config.depVariable ; 
+	text += "Figure shows variation in "+ vDepDescriptor + config.depVariable + " " + '<svg height="20" width="20" ><circle cx="10" cy="10" r="10" stroke-width="1" fill=+'+dotColor+'/></svg>'; 
 
 	text += (config.causality== "yes") ? " caused by " : " and "; 
 	text += config.indVariable + " across different "+ config.granularity + " of "  + config.geoRegion + " during " + config.year + ".";
@@ -534,9 +540,9 @@ function Create2DArray(rows) {
   for (var i=0;i<rows;i++) {
      arr[i] = [];
   }
-
   return arr;
 }
+
 function computeSpatialTrends(data,config){
   var text="";
   var distinctRegions = [];
@@ -661,10 +667,10 @@ function generateSpatialTrendText(dRs,rGs, config){
 	var neg_corr_arr = [];
 
 	 for(var i=0;i<corr_arr.length;i++){
-		if(corr_arr[i] > 0.75){
+		if(corr_arr[i] > 0.5){
 			pos_corr_arr.push(i);
 		}
-		if(corr_arr[i] < -0.75){
+		if(corr_arr[i] < -0.5){
 			neg_corr_arr.push(i);
 		}
 	}

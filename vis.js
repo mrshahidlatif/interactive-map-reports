@@ -1,7 +1,10 @@
 //-------------------------------------------------
 //Global Variables
 //-------------------------------------------------
-var path; 
+var path;
+var dotColor;
+var lowColor;
+var highColor; 
 //-------------------------------------------------
 
 function generateVis(canvas, config){
@@ -11,19 +14,24 @@ function generateVis(canvas, config){
   //Color Scheme
   switch (config.situation) {
     case "positive":
-        var dotColor = '#0a68ff'
-        var lowColor = '#f9f9f9'
-        var highColor = '#16ad1b'
-      break;
+         dotColor = '#2a4fc9'
+        lowColor = '#afdbc4'
+        highColor = '#047c3e'
+        break;
     case "negative":
-        var dotColor = '#f44242'
-        var lowColor = '#33ccff'
-        var highColor = '#ff99cc'
+         dotColor = '#000000'
+         lowColor = '#ffb7b7'
+         highColor = '#ff0000'
+        break;
+    case "neutral":
+         dotColor = '#f1ffa5'
+         lowColor = '#ccc9c9'
+         highColor = '#424040'
+        break;
     default:
       // statements_def
       break;
   }
-
 
   var geoJSON = config.geoJSONFile; 
   var dataFile = config.dataFile;  
@@ -62,7 +70,6 @@ function generateVis(canvas, config){
               svg.attr("transform", d3.event.transform)
       }))
     .append("g");
-
   
   // Load in my states data!
   d3.csv(dataFile, function(data) {
@@ -231,6 +238,12 @@ function generateVis(canvas, config){
         .attr("height", h)
         .style("fill", "url(#gradient)")
         .attr("transform", "translate("+(width/2 - w) +","+(height-50)+")");
+
+      key.append("text")
+        .attr("class", "legend-text")
+        .attr("x",width/2 - w)
+        .attr("y",height-30)
+        .text(config.indVariable.toProperCase());
       
       //Adding legend values
       key.append("text")
@@ -248,16 +261,15 @@ function generateVis(canvas, config){
       key.append("circle")
         .attr("class", "dots")
         .attr("fill", dotColor)
-        .attr("cx",width/2 + 30 )
+        .attr("cx",width/2 + 30 +10 )
         .attr("cy",height-48)
         .attr("r",10)
 
       key.append("text")
         .attr("class", "legend-text")
-        .attr("x",width/2 + 43 )
-        .attr("y",height-44)
-        .text(config.depVariable.toProperCase())
-
+        .attr("x",width/2 + 30 )
+        .attr("y",height-30)
+        .text(config.depVariable.toProperCase());
 
     });
   });
