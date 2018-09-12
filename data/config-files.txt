@@ -2,14 +2,13 @@ For USA - storms-death
 -------
 {
 	"geoRegion": "the United States of America",
-	"geoJSONRegion":"geography/countries/USA.geo.json",
 	"granularity":"states",
 	"regionID" : "id",
 	"indVariable": "storms",
 	"depVariable": "deaths",
 	"unit": "number",
 	"situation": "negative",
-	"typeDepVariable": "continuous",
+	"typeDepVariable": "life-loss",
 	"typeIndVariable": "continuous",
 	"year":"2017",
 	"geoJSONFile":"us-states.json",
@@ -39,7 +38,6 @@ For Europe
 
 {
 	"geoRegion": "Europe",
-	"geoJSONRegion":"geography/countries/POL.geo.json",
 	"granularity":"countries",
 	"regionID" : "id",
 	"indVariable": "health_expenditure",
@@ -49,22 +47,41 @@ For Europe
 	"situation": "positive",
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
-	"dataFile":"health-life-expectancy.csv"
+	"dataFile":"health-life-expectancy.csv",
+	"causality": "no"
 }
 
 Stork example 
 -------------
 {
 	"geoRegion": "Europe",
-	"geoJSONRegion":"geography/countries/POL.geo.json",
 	"granularity":"countries",
-	"regionID" : "id",
-	"indVariable": "health_expenditure",
-	"depVariable": "life_expectancy",
+	"regionID" : "Country",
+	"indVariable": "Storks",
+	"depVariable": "Birth-rate",
 	"typeDepVariable": "discrete",
-	"typeIndVariable": "discrete",
+	"typeIndVariable": "continuous",
 	"situation": "neutral",
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
-	"dataFile":"storks-birth-data.csv"
+	"dataFile":"storks-birth-data.csv",
+	"causality":"no"
+}
+
+population per capita-income USA
+--------------------------------
+{
+	"geoRegion": "the United States of America",
+	"granularity":"states",
+	"regionID" : "state",
+	"indVariable": "population",
+	"depVariable": "per-capita-income",
+	"unit": "number",
+	"situation": "positive",
+	"typeDepVariable": "discrete",
+	"typeIndVariable": "discrete",
+	"year":"2015",
+	"geoJSONFile":"us-states.json",
+	"dataFile":"pop-pci-usa.csv",
+	"causality": "no"
 }

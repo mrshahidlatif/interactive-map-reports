@@ -24,7 +24,7 @@ function generateVis(canvas, config){
          highColor = '#ff0000'
         break;
     case "neutral":
-         dotColor = '#f1ffa5'
+         dotColor = '#04f2f2'
          lowColor = '#ccc9c9'
          highColor = '#424040'
         break;
@@ -138,7 +138,7 @@ function generateVis(canvas, config){
         .on("mouseout", function() {
           d3.select(this)
           .transition().duration(300)
-          .style("opacity", 0.8);
+          .style("opacity", 1);
           div.transition().duration(300)
           .style("opacity", 0);
         })
@@ -202,8 +202,7 @@ function generateVis(canvas, config){
   //                             currTranslate[1] + d3.event.dy]);
   //       svg.selectAll("path").attr("d", path);
   //   }));
-
-      
+     
       // add a legend
       var w = 150, h = 10;
 

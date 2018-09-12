@@ -7,34 +7,33 @@ var verb = "";
 //------------------------------
 //Thresold parameters 
 //------------------------------
-var POSITIVE_CORRELATION = 0.4;
+var POSITIVE_CORRELATION = 0.5;
 var NEGATIVE_CORRELATION = -0.5;
 //-------------------------------
 
 function generateNarrative(data,config){
 
-	console.log(allData);
-	console.log(config);
-	console.log(data);
+	// console.log(allData);
+	// console.log(data);
 	// console.log(geoOrientationData);
 	var minVal = getMin(allData, config.indVariable);
 	var maxVal = getMax(allData, config.indVariable);
 	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor]);
 
-	console.log(ramp(200));
-	console.log(dotColor);
+	// console.log(ramp(200));
+	// console.log(dotColor);
 	
 	//Adding title to the report
 	document.getElementById("reportTitle").innerHTML = config.depVariable.toProperCase() + " and " + config.indVariable + ", "+ config.geoRegion + " ("+ config.year+")"; 
 
 	//verbs 
-	verb = "experience";
+	verb = "ha";
 
 	//Description of variables according to their type 
-	if (config.typeDepVariable == "continuous"){
+	if (config.typeDepVariable == "life-loss"){
 		vDepDescriptor = " number of "
 	}
-	else if (config.typeDepVariable == "discrete") {
+	else if (config.typeDepVariable == "money-gain") {
 		vDepDescriptor = " values of "
 	}
 
@@ -49,14 +48,14 @@ function generateNarrative(data,config){
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//First Sentence
-	text += "Figure shows variation in "+ vDepDescriptor + config.depVariable + " " + '<svg height="20" width="20" ><circle cx="10" cy="10" r="10" stroke-width="1" fill=+'+dotColor+'/></svg>'; 
+	text += "Figure shows variation in "+ vDepDescriptor + config.depVariable ;
 
 	text += (config.causality== "yes") ? " caused by " : " and "; 
 	text += config.indVariable + " across different "+ config.granularity + " of "  + config.geoRegion + " during " + config.year + ".";
 
 	if(config.causality=="yes"){ //Only print if there is causality in the variables
 		var corr = computeCorrelation(allData);
-		// console.log(corr); 
+		console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
 			text += " Overall, large "+ vIndDescriptor + config.indVariable + " are assoicated with large " + vDepDescriptor + config.depVariable+ ".";
 		}
@@ -70,24 +69,28 @@ function generateNarrative(data,config){
 	var outliers_v2 = getDataByFlag(data,"MAXV2");
 	var outliers_v1 = getDataByFlag(data, "MAXV1"); 
 
+	var avg_dV = ss.mean(ListOfObjToArray(allData, config.depVariable)); 
+
+	var minRegion = getRegionWithMinValue(allData, config.depVariable);
+	var maxRegion = getRegionWithMaxValue(allData, config.depVariable);
+
+
+	text += " The average " + config.depVariable + " were " + avg_dV+ ", and it "; 
+
 	//print only if there are ouliers. 
 	if (outliers_v2.length>0 && outliers_v1.length>0){
-		text += vDepDescriptor.capitalize() + config.depVariable + " vary from "+ getMin(allData, config.depVariable) + " to " + getMax(allData, config.depVariable) + " across various " + config.granularity;
+		text += " varies from "+ getMin(allData, config.depVariable) + " (" + minRegion[config.regionID].toProperCase() + ") " + " to " + getMax(allData, config.depVariable) + " (" + maxRegion[config.regionID].toProperCase() + ") " + " across " + config.geoRegion;
 		text += (config.causality=="no") ? ", whereas " + vIndDescriptor + config.indVariable +" ranges between " + getMin(allData, config.indVariable) + " and " + getMax(allData, config.indVariable)+"." : ".";
 	}
 
-	
 	// console.log(outliers_v2);
 	if(outliers_v2.length>0){  
 		text += stringifyList_v2(outliers_v2);
 	}
-	else {
-		
-		var minRegion = getRegionWithMinValue(allData, config.depVariable);
-		var maxRegion = getRegionWithMaxValue(allData, config.depVariable);
-		// console.log(minRegion)
-		text += " "+ config.depVariable.toProperCase() + " vary from "+ minRegion[config.depVariable] + " (" + minRegion[config.regionID] + ") " + " to " + maxRegion[config.depVariable] + " (" + maxRegion[config.regionID] + ") " + " across various " + config.granularity + " of " + config.geoRegion + ".";
-	}
+	// else {
+	// 	// console.log(minRegion)
+	// 	text += " "+ config.depVariable.toProperCase() + " vary from "+ minRegion[config.depVariable] + " (" + minRegion[config.regionID] + ") " + " to " + maxRegion[config.depVariable] + " (" + maxRegion[config.regionID] + ") " + " across various " + config.granularity + " of " + config.geoRegion + ".";
+	// }
 
 	data.sort(function(a,b){return +b[config.indVariable] - +a[config.indVariable]});
 	// console.log(data); 
@@ -110,34 +113,64 @@ function generateNarrative(data,config){
 		text += stringifyBivariateOutliers(bivariate_outliers); 
 	}
 
-
 	//Odd on out - regions showing different behavior compared to their neighbors 
+	var oddRegions_lower = []; 
+	var oddRegions_upper = [];
 
-	// if(existNeighborsInfo){
-	// 	var neighbors = geo_neighbors[name.toProperCase()].split(",");
-	// 	var neighbor_objects = getObjectsByNames(allData, neighbors);
-	// 	var arrOfNeighborValues = ListOfObjToArray(neighbor_objects, [config.depVariable]);
+	for (var i=0;i<allData.length;i++){
+		var rName = allData[i][config.regionID].toProperCase(); 
+		// console.log(rName);
+		if(rName !=undefined && existNeighborsInfo){
+			var neighbors = geo_neighbors[rName].split(",");
+			// console.log(neighbors);
+			var neighbor_objects = getObjectsByNames(allData, neighbors);
+			var arrOfNeighborValues = ListOfObjToArray(neighbor_objects, config.depVariable);
 
-	// 	// console.log(arrOfNeighborValues); 
+			// console.log(arrOfNeighborValues); 
 
-	// 	if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])){
-	// 		exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
-	// 		exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
+			var flag = isOutlierAmongNeighbors(arrOfNeighborValues, allData[i][config.depVariable]);
 
-	// 	}
-	// }
-
+			if(flag=="upper") { oddRegions_upper.push(rName); }
+			else if (flag=="lower"){ oddRegions_lower.push(rName); }
+		}
+			
+	}
 	//Spatial trend in variables
 	computeSpatialTrends(allData,config); 
+	text += describeOddRegions(oddRegions_lower, oddRegions_upper) ;
 
 	return text; 
+}
+function describeOddRegions(l, u){
+	// console.log(u);
+	var s = " ";
+	if (l.length>0 || u.length >0){
+		if (u.length > 0){
+			s += "The "+ config.granularity + " " + stringifyArray(u);
+			if(config.typeDepVariable == "life-loss"){
+				s += " suffered a lot more casualties "; 
+			}
+		}
+
+		if (l.length > 0){
+			s += "The "+ config.granularity + " " + stringifyArray(l);
+			if(config.typeDepVariable == "life-loss"){
+				s += " suffered a lot more casualties "; 
+			}
+		}
+
+		s+= " compared to their neighboring " + config.granularity + "."; 
+	}
+
+	return s; 
+
 }
 
 function stringifyBivariateOutliers(list){
 	var string = ""; 
 	var max_ratio = getMax(list, "v2_v1_ratio");
 	console.log(list); 
-	console.log(max_ratio);
+	// console.log(max_ratio);
 	switch (list.length) {
 		case 1:
 			string += " Quite unusual behavior can be observed in " + list[0][config.regionID].toProperCase() +"."; 
@@ -184,11 +217,13 @@ function stringifyList_v2(list){
 			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable+"." : ".";
 			break;
 		case 2:
-			string += " " + list[0][config.regionID].toProperCase() + getVerb("s", "past", verb);
-			string += (config.situation=="negative") ? " alarmingly high": "the highest";
-			string += vDepDescriptor + config.depVariable + " (" +list[0][config.depVariable] + ")" ;
-			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable + " followed by " : " followed by "; 
-			string += (config.causality == "yes") ? list[1][config.regionID].toProperCase() + " where "+ list[1][config.indVariable]+ " "+ config.indVariable + " caused " + list[1][config.depVariable]+ " " + config.depVariable+ "." : list[1][config.regionID].toProperCase() + " (" +list[1][config.depVariable]+ ").";
+			string += " "+ list[0][config.regionID].toProperCase() + " and " + list[1][config.regionID].toProperCase() + getVerb("s", "past", verb);
+			if (config.situation == "positive"){ string += " way better ";}
+			else if (config.situation == "positive"){ string += " alarmingly high ";}
+			else {string += " very high ";}
+			string += config.depVariable + " in comparison to other "+ config.granularity ;
+			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " and " + list[1][config.indVariable] + " " + config.indVariable+" respectively." : ".";
+			
 			break;
 		default:
 			string += " " + list[0][config.regionID].toProperCase() + getVerb("s", "past", verb);
@@ -205,7 +240,8 @@ function stringifyList_v2(list){
 	return string; 
 }
 function stringifyList_v1(list){
-	console.log(list)
+	list.sort(function(a,b){return +b[config.indVariable]- +a[config.indVariable];});
+	// console.log(list)
 	var string="";
 	switch (list.length) {
 		case 1:
@@ -254,10 +290,10 @@ function explainOnDemand(name,config){
 		exp += config.depVariable; 
 	}
 	else if(value_dV > avg_dV){
-		exp += name.toProperCase() + getVerb("s","past",verb) + " above average number of (" + value_dV + ") "+ config.depVariable;
+		exp += name.toProperCase() + getVerb("s","past",verb) + " above average (" + value_dV + ") "+ config.depVariable;
 	}
 	else if (value_dV < avg_dV){
-		exp += name.toProperCase() + getVerb("s","past",verb) + " below average number of (" + value_dV + ") " + config.depVariable;
+		exp += name.toProperCase() + getVerb("s","past",verb) + " below average (" + value_dV + ") " + config.depVariable;
 	}
 
 	//Based on independant variable
@@ -272,10 +308,10 @@ function explainOnDemand(name,config){
 		exp += config.indVariable; 
 	}
 	else if(value_iV > avg_iV){
-		exp += " and above average number of (" + value_iV + ") "+ config.indVariable;
+		exp += " and above average (" + value_iV + ") "+ config.indVariable;
 	}
 	else if (value_iV < avg_iV){
-		exp += " and below average number of (" + value_iV + ") " + config.indVariable;
+		exp += " and below average (" + value_iV + ") " + config.indVariable;
 	}
 
 	exp += " when compared to the whole of " + config.geoRegion + "."; 
@@ -297,7 +333,7 @@ function explainOnDemand(name,config){
 			exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
 
 		}
-		else {
+		else if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="lower"){
 			exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
 			exp += getVerb("s","past", verb) ;
 			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
@@ -369,7 +405,8 @@ function ListOfObjToArray(list, column){
 }
 function isOutlierAmongNeighbors(neighbors, p){
 
-	neighbors.push(p);
+	neighbors.push(+p);
+	// console.log(neighbors);
 	var firstQ = ss.quantile(neighbors, 0.25);
 	var thirdQ = ss.quantile(neighbors, 0.75);
 	var IQR = ss.interquartileRange(neighbors);
@@ -512,16 +549,17 @@ function analyse(data, config){
 		arr2D[i][0] = +data[i][config.indVariable];
 		arr2D[i][1] = +data[i][config.depVariable];
 	}
-	// console.log(arr2D);
+	console.log(arr2D);
 	var mDistances = mahalanobis(arr2D);
-
+	console.log(mDistances);
 	for (var i=0;i<mDistances.length;i++){
-		if(mDistances[i]>3){
+		if(mDistances[i]>4){
 			var obj= new Object() ;
 			obj[config.regionID] = data[mDistances.indexOf(mDistances[i])][config.regionID];
 			obj[config.indVariable] = data[mDistances.indexOf(mDistances[i])][config.indVariable];
 			obj[config.depVariable] = data[mDistances.indexOf(mDistances[i])][config.depVariable];
-			obj.v2_v1_ratio = obj[config.depVariable]/obj[config.indVariable]; 
+			obj.v2_v1_ratio = obj[config.depVariable]/obj[config.indVariable];
+			obj.mD = mDistances[i];
 			obj.flag = "BOL";
 			selectedData.push(obj);
 		}
@@ -674,39 +712,40 @@ function generateSpatialTrendText(dRs,rGs, config){
 			neg_corr_arr.push(i);
 		}
 	}
-	console.log(pos_corr_arr);
-	console.log(dRs[pos_corr_arr[0]])
+	// console.log(pos_corr_arr);
+	// console.log(dRs[pos_corr_arr[0]])
 	
-	if(pos_corr_arr.length>0){
+	if(config.causality=="yes" && pos_corr_arr.length>0){
 		text += " Strong positive correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
 		if(pos_corr_arr.length==1)
-			text += dRs[pos_corr_arr[0]] + " " +  config.granularity;
+			text += dRs[pos_corr_arr[0]] + " " +  config.granularity+ ".";
 		else if(pos_corr_arr.length==2)
-			text += dRs[pos_corr_arr[0]] + " and " + dRs[pos_corr_arr[1]] + " " + config.granularity;
-		// else {
-		// 	for(var i=0;i<pos_corr_arr.length; i++){
-		// 		if (i==pos_corr_arr.length-1){
-		// 			text+= "and "+dRs[pos_corr_arr[i]] + " "+ config.granularity;
-		// 		}
-		// 		else {
-		// 			text+= dRs[pos_corr_arr[i]]+ ", ";
-		// 		}
-		// 	}
-		// }
+			text += dRs[pos_corr_arr[0]] + " and " + dRs[pos_corr_arr[1]] + " " + config.granularity + ".";
+		else {
+			text = ""; 
+			// for(var i=0;i<pos_corr_arr.length; i++){
+			// 	if (i==pos_corr_arr.length-1){
+			// 		text+= "and "+dRs[pos_corr_arr[i]] + " "+ config.granularity;
+			// 	}
+			// 	else {
+			// 		text+= dRs[pos_corr_arr[i]]+ ", ";
+			// 	}
+			// }
+		}
 		 
 	}
 
-	if(neg_corr_arr.length>0){
+	if(config.causality=="yes" && neg_corr_arr.length>0){
 		text += " Negative correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
 		if(neg_corr_arr.length==1)
-			text += dRs[pos_corr_arr[0]] + config.granularity;
+			text += dRs[pos_corr_arr[0]] + config.granularity + ".";
 		else if(neg_corr_arr.length==2)
-			text += dRs[neg_corr_arr[0]] + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity;
+			text += dRs[neg_corr_arr[0]] + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity + ".";
 		// for(var i=0;i<neg_corr_arr.length; i++){
 		// 	text += "";
 		// } 
 	}
-	return text + "."; 
+	return text; 
 }
 
 function getTopNItems(items, minN, maxN) {
