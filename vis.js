@@ -5,6 +5,11 @@ var path;
 var dotColor;
 var lowColor;
 var highColor; 
+
+var width;
+var height; 
+var isCompareMode;
+var selectedRegions = []; 
 //-------------------------------------------------
 
 function generateVis(canvas, config){
@@ -38,15 +43,15 @@ function generateVis(canvas, config){
 
   
   var margin = {top: 0, right: 10, bottom: 30, left: 10};
-  var width = 650 -margin.left-margin.right;
-  var height = 550-margin.top - margin.bottom;
+  width = 600 -margin.left-margin.right;
+  height = 500-margin.top - margin.bottom;
   
   // D3 Projection
   if(config.geoRegion == "the United States of America"){
   var projection = d3.geoAlbersUsa()
   // var projection = d3.geoEquirectangular()
     .translate([width / 2, height / 2]) // translate to center of screen
-    .scale(800); // scale things down so see entire US
+    .scale(700); // scale things down so see entire US
   }
   else{
     var projection = d3.geoStereographic()
@@ -115,40 +120,57 @@ function generateVis(canvas, config){
       var div = d3.select("body").append("div")   
                   .attr("class", "tooltip")               
                   .style("opacity", 0);
-      var selectedRegions = []; 
 
       // Bind the data to the SVG and create one path per GeoJSON feature
       svg.selectAll("path")
         .data(json.features)
         .enter()
         .append("path")
+        .attr("class","regions")
+        // .attr("id",function(d){return d.properties.name;})
         .attr("d", path)
         .style("stroke", "#000")
         .style("stroke-width", "1")
         .style("fill", function(d) { return ramp(d.properties.value) })
          //Adding mouseevents
         .on("mouseover", function(d) {
-          d3.select(this).transition().duration(300).style("opacity", 1);
+          // d3.select(this).transition().duration(300).style("opacity", 1);
           div.transition().duration(300)
           .style("opacity", 1)
-          div.text(d.properties.name + " : " + d.properties.value + " " + config.indVariable)
+          div.text(d.properties.name + " : " + d.properties.value + " " + config.indVariable + ", "+ d.properties.value2 + " "+ config.depVariable)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY -30) + "px");
         })
         .on("mouseout", function() {
-          d3.select(this)
-          .transition().duration(300)
-          .style("opacity", 1);
+          // d3.select(this)
+          // .transition().duration(300)
+          // .style("opacity", 1);
           div.transition().duration(300)
           .style("opacity", 0);
         })
         .on("click",function(d){
-          selectedRegions.push(d.properties.name); 
-          explainOnDemand(d.properties.name,config);
-          if(d3.event.ctrlKey){
+          if(isCompareMode){
             selectedRegions.push(d.properties.name);
-            compareTwoRegions(selectedRegions[0],selectedRegions[1],config); 
-            selectedRegions.length = 0; 
+            svg.selectAll("path").style("opacity", 1);
+            svg.selectAll("path").filter(function(d){
+              if (d.properties.name != selectedRegions[0] && d.properties.name != selectedRegions[1] ){
+                return true; 
+              }
+            })
+              .style("opacity", .2);
+            compareTwoRegions(selectedRegions[0],selectedRegions[1],config);
+            selectedRegions.length=0;
+            d3.select("#" + "map").selectAll(".infoText").remove();
+            d3.select("#" + "map").selectAll(".infoIcon").remove();
+            isCompareMode = false; 
+
+          }
+          else {
+            svg.selectAll("path").style("opacity", 1);
+            highlightRegion(d.properties.name);
+            explainOnDemand(d.properties.name,config);
+            selectedRegions.length=0; 
+            selectedRegions.push(d.properties.name);
           }
         });
 
@@ -170,7 +192,7 @@ function generateVis(canvas, config){
         .on("mouseover", function(d) {
           d3.select(this).transition().duration(300).style("opacity", 1);
           div.transition().duration(300)
-          .style("opacity", 1)
+          .style("opacity", 0.5)
           div.text(d.properties.name + " : " + d.properties.value2 + " "+ config.depVariable)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY -30) + "px");
@@ -178,30 +200,10 @@ function generateVis(canvas, config){
         .on("mouseout", function() {
           d3.select(this)
           .transition().duration(300)
-          .style("opacity", 0.8);
+          .style("opacity", 1);
           div.transition().duration(300)
           .style("opacity", 0);
         });
-
-  // var svg = svg.append("g")
-  // svg
-  //   .on("wheel.zoom",function(){
-  //       var currScale = projection.scale();
-  //       var newScale = currScale - 2*event.deltaY;
-  //       var currTranslate = projection.translate();
-  //       var coords = projection.invert([event.offsetX, event.offsetY]);
-  //       projection.scale(newScale);
-  //       var newPos = projection(coords);
-  //       projection.translate([currTranslate[0] + (event.offsetX - newPos[0]), currTranslate[1] + (event.offsetY - newPos[1])]);
-  //       svg.selectAll("path").attr("d", path);
-  //       // svg.selectAll(".dots").attr("transform", "translate(",20+")")
-  //   })
-  //   .call(d3.drag().on("drag", function(){
-  //       var currTranslate = projection.translate();
-  //       projection.translate([currTranslate[0] + d3.event.dx,
-  //                             currTranslate[1] + d3.event.dy]);
-  //       svg.selectAll("path").attr("d", path);
-  //   }));
      
       // add a legend
       var w = 150, h = 10;
@@ -272,6 +274,7 @@ function generateVis(canvas, config){
 
     });
   });
+
 }
 
 // https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
@@ -292,51 +295,32 @@ String.prototype.capitalize = function() {
     else 
       return this.charAt(0).toUpperCase() + this.slice(1);
 }
-//labelling the regions with North, South, East, and West 
-// function getOrientations(path){
-//   var geoRegionCenter; 
-//   d3.json("geography/countries/USA.geo.json", function(json) {
-//      for (var j = 0; j < json.features.length; j++) {
-//           var stateName = json.features[j].properties.name;
-//           geoRegionCenter = path.centroid(json.features[j].geometry); 
-//           //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
-//         }
-   
-//     // console.log(geoRegionCenter); 
-//     d3.json("us-states.json", function(json) {
-//        for (var j = 0; j < json.features.length; j++) {
-//             var stateName = json.features[j].properties.name;
-//             var currentCenter = path.centroid(json.features[j].geometry); 
-//             //console.log( stateName + " : " + path.centroid(json.features[j].geometry)); 
-//             if(currentCenter[1]<geoRegionCenter[1]){
-//               var o = new Object();
-//               o["regionName"] = stateName;
-//               o["orientation"] = "North"
-//               geoOrientationData.push(o);
-//               // console.log( stateName + " : " + "North"); 
-//             }
-//             else {
-//               var o = new Object();
-//               o["regionName"] = stateName;
-//               o["orientation"] = "South"
-//               geoOrientationData.push(o);
-//               // console.log( stateName + " : " + "South");
-//             }
-//             if(currentCenter[0]<geoRegionCenter[0]){
-//                 var o = new Object();
-//               o["regionName"] = stateName;
-//               o["orientation"] = "West"
-//               geoOrientationData.push(o);
-//               // console.log( stateName + " : " + "West"); 
-//             }
-//             else {
-//               var o = new Object();
-//               o["regionName"] = stateName;
-//               o["orientation"] = "East"
-//               geoOrientationData.push(o);
-              
-//             }
-//           }
-//     });
-//   });
-// }
+
+function highlightRegion(name){
+  // console.log(name);
+  var regions = d3.select("#" + "map").selectAll("path").style("opacity", 1);
+  var regions = d3.select("#" + "map")
+    .selectAll("path").filter(function(d){return d.properties.name != name;})
+    .style("opacity", .2);
+  d3.select("#" + "map").selectAll(".infoText").remove();
+  d3.select("#" + "map").selectAll(".infoIcon").remove();
+  addCompareBtn();
+
+}
+
+function addCompareBtn(){
+  d3.select("#" + "map")
+    .append("text")
+    .attr("class", "infoText")
+    .attr("x",20)
+    .attr("y",23)
+    .text("(Click to compare two "+ config.granularity+")");
+
+  d3.select("#" + "map")
+    .append("text")
+    .attr("class", "infoIcon")
+    .attr("x",0)
+    .attr("y",25)
+    .html("&#x1F6C8;")
+
+}

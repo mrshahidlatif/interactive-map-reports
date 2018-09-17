@@ -84,7 +84,7 @@ a:hover{
 
 .leftcolumnHeader {
     float: left;
-    width: 55%; 
+    width: 60%; 
     height: 100%;
     padding-top: 10px;
     padding-left: 10px;
@@ -112,23 +112,28 @@ a:hover{
     /*margin-left: 200px; */
     float: left;
     width: 55%; 
-    padding-top: 20px;
+/*    padding-top: 20px;
     padding-left: 10px;
-    padding-right: 20px;
+    padding-right: 20px;*/
     text-align: center;
+    border-style: solid;
+    border-width: 1px;
 }
 /* Right column */
 .rightcolumn {
     /*margin-right: 200px;*/
     float: left;
-    width: 40%;
+    width: 45%;
     /*background-color: #f1f1f1;*/
-    padding-top: 20px;
+/*    padding-top: 20px;*/
     padding-left: 20px;
-  /*  padding-right: 10px;*/
+    padding-right: 10px;
     /*max-height: 1000px;*/
     height:100%;
     /*overflow: auto;*/
+
+/*    border-style: solid;
+    border-width: 1px;*/
 
 }
 /* Clear floats after the columns */
@@ -216,7 +221,7 @@ div.tooltip {
   position: absolute;           
   text-align: center;           
   width: 150px;                  
-  height: 25px;                 
+  height: 35px;                 
   padding: 2px;             
   font-size: 10px;     
   background: #dbdbdb;
@@ -224,4 +229,39 @@ div.tooltip {
   border-radius: 8px;           
   pointer-events: none;  
   z-index: 90      
-} 
+}
+.rID {
+  font-weight: bold;
+}
+
+.rID:hover{
+  color: DodgerBlue;
+  cursor: pointer;
+
+}
+/* Info icon and info text in the visualization */
+.infoIcon {
+    font-size: 20px; 
+}
+.infoIcon:hover {
+  fill: DodgerBlue;
+  cursor: pointer;
+}
+
+.infoText{
+  font-size: 12px; 
+}
+/*
+.infoText:hover{
+  fill: DodgerBlue;
+  cursor: pointer;
+
+}*/
+
+.infoIcon.green { fill: #00cc00; }
+
+/* info icon in the text */
+.moreInfoIcon:hover {
+    fill: DodgerBlue;
+    cursor: pointer;
+  }

@@ -4,6 +4,7 @@
 <head>
   <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="lib/simple-statistics.min.js"></script>
   <script src="lib/mahalanobis.min.js"></script>
   <script src="geo_neighbors.js"></script>
@@ -36,12 +37,14 @@
 
   <div class="row">
     <div class="leftcolumn">
-      <svg width="600" height="500" id="map"></svg>
+      <svg id="map"></svg>
     </div>
     <div class="rightcolumn">
+        <p id="intro"></p>
+        <p id="focusVText"></p>
+        <p id="rText"></p>
         <p id="text"></p>
         <p id="strend"></p>
-
         <h3 id="eod-head"></h3>
         <p id="eod"></p>
     </div>
@@ -62,10 +65,22 @@
         data = d;
           generateVis("map", config);
           var facts = analyse(data, config);
-          document.getElementById("text").innerHTML = generateNarrative(facts, config); 
+          generateNarrative(facts, config); 
       });
     });
+    $(document).ready(function(){
+        console.log("iMR loaded!");
+        $('body').on('click', '.rID', function() {
+           highlightRegion($(this).text());
+         })
 
+        $('body').on('click', '.infoIcon', function() {
+             // $(this).css({ 'border': '1px solid blue', 'fill': 'red' });
+             isCompareMode = !isCompareMode; 
+            $(this).toggleClass("green");
+       })
+});
+    
   </script>
 </body>
 

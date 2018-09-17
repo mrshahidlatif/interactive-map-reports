@@ -1,6 +1,6 @@
 {
 	"geoRegion": "the United States of America",
-	"granularity":"states",
+	"granularity":"state",
 	"regionID" : "id",
 	"indVariable": "storms",
 	"depVariable": "deaths",
