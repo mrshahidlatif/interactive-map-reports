@@ -34,10 +34,14 @@ hr{
 }
 .rowHeader{
     width: 1090px;
-    margin: 0 auto;
-    text-align:left;
+    padding-bottom: 10px;
+    /* text-align:left; */
+    margin: auto;
     vertical-align: middle;
-    margin-top: 115px;
+    text-align: center;
+    margin-top: 0px;
+    font-size: 20px;
+    font-weight: bold;
 
 }
 .header {
@@ -52,7 +56,7 @@ hr{
 
 body
 {
-    margin: 130px auto;
+    margin: 100px auto;
     font-family: Segoe UI,Frutiger,Frutiger Linotype,Dejavu Sans,Helvetica Neue,Arial,sans-serif; 
     color: black;
     font-size: 12pt;
@@ -112,7 +116,7 @@ a:hover{
     /*margin-left: 200px; */
     float: left;
     width: 55%; 
-/*    padding-top: 20px;
+    /*    
     padding-left: 10px;
     padding-right: 20px;*/
     text-align: center;
@@ -180,7 +184,7 @@ a:hover{
     vertical-align: middle;
     line-height: 5px;  
     font-size: 08pt;
-    border-top: 1px solid gray;
+    border-top: 1px solid #16ad1b;
     background-color: white;
 }
 
@@ -276,7 +280,7 @@ div.tooltip {
     background-color: #16ad1b;
     overflow-x: hidden;
     transition: 0.3s;
-    padding-top: 60px;
+    padding-top: 75px;
 }
 
 .sidenav a {
