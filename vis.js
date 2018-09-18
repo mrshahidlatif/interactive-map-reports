@@ -66,6 +66,9 @@ function generateVis(canvas, config){
   //Getting orientation of geographic regions 
   // getOrientations(path);
 
+  //removing previous SVG 
+  d3.select("#" + canvas).selectAll("*").remove();
+
   //Create SVG element and append map to the SVG
   var svg = d3.select("#" + canvas)
     // .append("svg")
@@ -168,7 +171,7 @@ function generateVis(canvas, config){
           else {
             svg.selectAll("path").style("opacity", 1);
             highlightRegion(d.properties.name);
-            explainOnDemand(d.properties.name,config);
+            explainOnDemand(d.properties.name,config,ramp);
             selectedRegions.length=0; 
             selectedRegions.push(d.properties.name);
           }

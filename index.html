@@ -9,7 +9,7 @@
   <script src="lib/mahalanobis.min.js"></script>
   <script src="geo_neighbors.js"></script>
   <script src="regions-usa.js"></script>
-   <!-- <script src="regions-europe.js"></script> -->
+  <script src="config.js"></script>
 
   <script src="vis.js"></script>
   <script src="nlg.js"></script>
@@ -18,12 +18,18 @@
   <title id="pageTitle">iMR</title>
 </head>
 <body>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a class="exampleSwitch" id="example1">USA - Deaths and Storms</a>
+        <a class="exampleSwitch" id="example2">Europe - life expectancy and health expenditures</a>
+      </div>
     <div class="header">
        <div id="logo"> 
           <img src="logo/logo.png" width="120" height="35" alt="" />
         </div>
     </div>
   <div class="navbar">
+      <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
   </div>
     <div class="rowHeader">
            <h3 align="center", id="reportTitle"></h3>
@@ -58,28 +64,57 @@
     </ul>
   </div>
   <script>
-    var data=[];
-    d3.json("config.json", function(d){
-      config = d; 
-      d3.csv(config.dataFile, function(d){
-        data = d;
-          generateVis("map", config);
-          var facts = analyse(data, config);
-          generateNarrative(facts, config); 
-      });
-    });
+    function openNav() {
+      document.getElementById("mySidenav").style.width = "250px";
+    }
+    function closeNav() {
+      document.getElementById("mySidenav").style.width = "0";
+    }
     $(document).ready(function(){
         console.log("iMR loaded!");
+        
+        var config="";
+        var regions="";
         $('body').on('click', '.rID', function() {
            highlightRegion($(this).text());
          })
 
         $('body').on('click', '.infoIcon', function() {
-             // $(this).css({ 'border': '1px solid blue', 'fill': 'red' });
              isCompareMode = !isCompareMode; 
             $(this).toggleClass("green");
        })
-});
+       $('body').on('click', '.exampleSwitch', function(e) {
+         $("map").empty();
+         loadExample(e.target.id);
+       })
+  });
+
+  function loadExample(id){
+    var data=[];
+    // d3.json("config.json", function(d){
+      console.log(id)
+    switch (id) {
+      case "example1":
+        config = e1_config;
+        regions = e1_regions;
+        break;
+      case "example2":
+        config = e2_config;
+        regions = e2_regions;
+        break;
+    
+      default:
+        break;
+    }
+    d3.csv(config.dataFile, function(d){
+      data = d;
+      generateVis("map", config);
+      var facts = analyse(data, config);
+      generateNarrative(facts, config); 
+    });
+    // });
+    closeNav();
+  }
     
   </script>
 </body>

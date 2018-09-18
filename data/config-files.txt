@@ -18,8 +18,7 @@ For USA - storms-death
 For USA - accidents 
 {
 	"geoRegion": "the United States of America",
-	"geoJSONRegion":"geography/countries/USA.geo.json",
-	"granularity":"states",
+	"granularity":"state",
 	"regionID" : "id",
 	"indVariable": "pedestrian-fatalities",
 	"depVariable": "bicyclist-fatalities",
@@ -72,7 +71,7 @@ population per capita-income USA
 --------------------------------
 {
 	"geoRegion": "the United States of America",
-	"granularity":"states",
+	"granularity":"state",
 	"regionID" : "state",
 	"indVariable": "population",
 	"depVariable": "per-capita-income",

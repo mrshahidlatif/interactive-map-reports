@@ -1,13 +1,13 @@
 var allData; 
-var existNeighborsInfo = true;
+var existNeighborsInfo = false;
 //Description of variables according to their type 
 var vDepDescriptor="";
 var vIndDescriptor="";
-var verb = ""; 
+var verb = "";
 //------------------------------
 //Thresold parameters 
 //------------------------------
-var POSITIVE_CORRELATION = 0.4;
+var POSITIVE_CORRELATION = 0.5;
 var NEGATIVE_CORRELATION = -0.5;
 //-------------------------------
 
@@ -27,10 +27,10 @@ function generateNarrative(data,config){
 	verb = "ha";
 
 	//Description of variables according to their type 
-	if (config.typeDepVariable == "life-loss"){
+	if (config.typeDepVariable == "continuous"){
 		vDepDescriptor = " number of "
 	}
-	else if (config.typeDepVariable == "money-gain") {
+	else if (config.typeDepVariable == "discrete") {
 		vDepDescriptor = " values of "
 	}
 
@@ -73,12 +73,12 @@ function generateNarrative(data,config){
 	var moreRegionsWithMaxValueString = "Other similar regions are " + stringifyListOfObjects(regionsWithMaxValues);
 	
 
-	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " were " + avg_dV+ ", and it "; 
+	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV + ", and it "; 
 	focusVText += " varies from ";
 	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable);
 	focusVText += " in " + '<span class="rID" style="background-color:'+ramp(getMin(allData, config.depVariable))+'">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
 	focusVText += (regionsWithMinValues.length > 1) ? '<span title="'+ moreRegionsWithMinValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
-	focusVText += " to " + getMax(allData, config.indVariable) + " in " + '<span class="rID" style="background-color:'+ramp(getMax(allData, config.indVariable))+'">'+ maxRegion[config.regionID].toProperCase() + '</span>';
+	focusVText += " to " + getMax(allData, config.depVariable) + " in " + '<span class="rID" style="background-color:'+ramp(getMax(allData, config.indVariable))+'">'+ maxRegion[config.regionID].toProperCase() + '</span>';
 	focusVText += (regionsWithMaxValues.length > 1) ? '<span title="'+ moreRegionsWithMaxValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
 	focusVText += " across " + config.geoRegion +".";
 
@@ -96,8 +96,8 @@ function generateNarrative(data,config){
 
 	for (var i=0;i<allData.length;i++){
 		var rName = allData[i][config.regionID].toProperCase(); 
-		// console.log(rName);
-		if(rName !=undefined && existNeighborsInfo){
+		console.log(rName);
+		if(rName != undefined && existNeighborsInfo){
 			var neighbors = geo_neighbors[rName].split(",");
 			// console.log(neighbors);
 			var neighbor_objects = getObjectsByNames(allData, neighbors);
@@ -184,8 +184,9 @@ function describeOddRegions(l, u, ramp){
 	var uObjects = getObjectsByNames(allData,u);
 	// console.log(uObjects);
 
-	var s = " The " + config.granularity+ " " ;
+	var s="";
 	if (l.length>0 || u.length >0){
+		s += " The " + config.granularity+ " " ;
 		if (u.length > 0){
 			s += stringifyListOfObjectswithColorCoding(uObjects,ramp);
 			if(config.typeDepVariable == "life-loss"){
@@ -299,7 +300,7 @@ function stringifyList_v2(list,ramp){
 	switch (list.length) {
 		case 1:  
 			string += " Other "+ config.granularity + " showing high ";
-			string += vDepDescriptor + " " + config.depVariable + " is " + + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable] + ") " ;
+			string += vDepDescriptor + " " + config.depVariable + " is " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable] + ")" ;
 			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable+"." : ".";
 			break;
 		case 2:
@@ -347,7 +348,7 @@ function stringifyList_v1(list){
 function getDataByFlag(data,flag){
 	return  data.filter(function(d){return d.flag == flag});
 }
-function explainOnDemand(name,config){
+function explainOnDemand(name,config,ramp){
 	var exp = ""; 
 	
 	document.getElementById("eod-head").innerHTML = name.toProperCase();
@@ -360,21 +361,23 @@ function explainOnDemand(name,config){
 	// console.log(value_iV); 
 
 	//Based on dependant variable
+	exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + name.toProperCase()+ '</span>'; 
+	exp += getVerb("s","past",verb) ;
+
+
 	if(value_dV == getMin(allData,config.depVariable)) {
-		exp += name.toProperCase() + getVerb("s","past",verb) ;
 		exp += (value_dV==0) ? "no " : "the lowest" + vDepDescriptor + " (" + value_dV+") ";
 		exp += config.depVariable; 
 	}
 	else if(value_dV == getMax(allData,config.depVariable)) {
-		exp += name.toProperCase() + getVerb("s","past",verb) ;
 		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor + " (" + value_dV+") ";
 		exp += config.depVariable; 
 	}
 	else if(value_dV > avg_dV){
-		exp += name.toProperCase() + getVerb("s","past",verb) + " above average (" + value_dV + ") "+ config.depVariable;
+		exp += " above average (" + value_dV + ") "+ config.depVariable;
 	}
 	else if (value_dV < avg_dV){
-		exp += name.toProperCase() + getVerb("s","past",verb) + " below average (" + value_dV + ") " + config.depVariable;
+		exp += " below average (" + value_dV + ") " + config.depVariable;
 	}
 
 	//Based on independant variable
@@ -395,7 +398,7 @@ function explainOnDemand(name,config){
 		exp += " and below average (" + value_iV + ") " + config.indVariable;
 	}
 
-	exp += " when compared to the whole of " + config.geoRegion + "."; 
+	exp += " when compared to the other " + config.granularity + "."; 
 	// console.log(selectedRegion);
 	allData.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 	var rank = allData.findIndex(x => x[config.regionID].toLowerCase() == name.toLowerCase()) +1; 
@@ -410,12 +413,18 @@ function explainOnDemand(name,config){
 		// console.log(arrOfNeighborValues); 
 
 		if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="upper"){
-			exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
-			exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
+			var objs = getObjectsByNames(allData, neighbors); 
 
+			exp += " Compared to its neighbors, ";
+			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
+			exp +=  ", " + name.toProperCase();
+			exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
 		}
 		else if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="lower"){
-			exp += " Compared to its neighbors, " +stringifyArray(neighbors) + ", " + name.toProperCase();
+			var objs = getObjectsByNames(allData, neighbors); 
+			exp += " Compared to its neighbors, ";
+			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
+			exp += ", " + name.toProperCase();
 			exp += getVerb("s","past", verb) ;
 			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
 			exp += config.depVariable + ".";
