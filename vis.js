@@ -275,6 +275,9 @@ function generateVis(canvas, config){
         .attr("y",height-30)
         .text(config.depVariable.toProperCase());
 
+        $(".leftcolumn").css('border-style','solid');
+        $(".leftcolumn").css('border-width','1px');
+
     });
   });
 
