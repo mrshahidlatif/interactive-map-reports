@@ -17,10 +17,10 @@ hr{
     float:right;
     display: block;
     padding-left: 10px;
-    padding-right: 15px;
-    padding-top: 10px;
-    font-size: 30px;
-    color: white;
+    /* padding-right: 5px; */
+    padding-top: 5px;
+    /* font-size: 30px; */
+    /* color: white; */
 }
 
 .navbar {
