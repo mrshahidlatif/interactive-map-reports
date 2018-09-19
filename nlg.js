@@ -26,7 +26,7 @@ function generateNarrative(data,config){
 	verb = "ha";
 
 	//Description of variables according to their type 
-	if (config.typeDepVariable == "continuous"){
+	if (config.typeDepVariable == "continuous" || config.typeDepVariable == "casualties" || config.typeDepVariable == "incidents"){
 		vDepDescriptor = " number of "
 	}
 	else if (config.typeDepVariable == "discrete") {
@@ -43,13 +43,18 @@ function generateNarrative(data,config){
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//Introductor paragraph
-	var intro = "The map shows the "+ vDepDescriptor + config.depVariable ;
+	var intro = "The map shows the "+ vDepDescriptor + config.depVariable +" ";
+	intro += '<svg id="inlineDot" width="20px" height="20"></svg>'
 
 	intro += (config.causality== "yes") ? " caused by " : " and "; 
-	intro += config.indVariable + " across the different "+ config.granularity + " of "  + config.geoRegion + " during " + config.year + ".";
+	intro += config.indVariable + '<svg id="inlineLegend" width="70px" height="15"></svg>' + " across the different "+ config.granularity + " of "  + config.geoRegion + " during " + config.year + ".";
 
 	$("#intro").html(intro);
-
+	
+	// rendering inline legend
+	makeInlineLegend("inlineLegend", 15,70);
+	makeInlineDot("inlineDot", 20,20);
+	
 	//Description of the focus variable
 	var focusVText="";
 
@@ -858,3 +863,52 @@ function getVerb(sub, time, verb){
 	return " " + verb + "d "; 
 
 }
+function makeInlineLegend(canvas,h,w){
+	var key = d3.select("#" + canvas)
+			.append("g")
+			.attr("width", w)
+			.attr("height", h)
+			.attr("class", "legend");
+
+	var legend = key.append("defs")
+			.append("g:linearGradient")
+			.attr("id", "gradient")
+			.attr("x1", "100%")
+			.attr("y1", "100%")
+			.attr("x2", "0%")
+			.attr("y2", "100%")
+			.attr("spreadMethod", "pad");
+
+	legend.append("stop")
+			.attr("offset", "0%")
+			.attr("stop-color", highColor)
+			.attr("stop-opacity", 1);
+			
+	legend.append("stop")
+			.attr("offset", "100%")
+			.attr("stop-color", lowColor)
+			.attr("stop-opacity", 1);
+
+	key.append("rect")
+			.attr("width", w)
+			.attr("height", h)
+			.style("fill", "url(#gradient)")
+			.attr("transform", "translate(0,0)");
+	
+}
+function makeInlineDot(canvas,h,w){
+	var key = d3.select("#" + canvas)
+			.append("g")
+			.attr("width", w)
+			.attr("height", h)
+			.attr("class", "legend");
+	
+			key.append("circle")
+			.attr("class", "dots")
+			.attr("fill", dotColor)
+			.attr("cx",w/2 )
+			.attr("cy",h/2)
+			.attr("r",10)
+	
+}
+

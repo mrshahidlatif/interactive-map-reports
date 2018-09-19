@@ -320,3 +320,8 @@ div.tooltip {
 /* .exampleSwitch:hover{
     cursor: pointer;
 } */
+
+svg {
+    display: inline-block;
+     vertical-align: middle;
+  }
