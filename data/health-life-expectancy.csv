@@ -2,8 +2,6 @@ id,life_expectancy,health_expenditure
 United Kingdom,81.6,3755.94
 Ukraine,71.19,0
 Turkey,75.43,974.84
-Tunisia,74.98,0
-Syria,70.09,0
 Switzerland,83.2,6062.26
 Sweden,82.55,4906.86
 Spain,83.38,2896.87
@@ -51,8 +49,6 @@ Albania,78.01,0
 United Kingdom,81.6,3755.94
 Ukraine,71.19,0
 Turkey,75.43,974.84
-Tunisia,74.98,0
-Syria,70.09,0
 Switzerland,83.2,6062.26
 Sweden,82.55,4906.86
 Spain,83.38,2896.87
@@ -71,7 +67,6 @@ Macedonia,75.5,0
 Luxembourg,82.23,6758.79
 Lithuania,75.12,0
 Liechtenstein,82.07,0
-Lebanon,79.63,0
 Latvia,74.12,1229.79
 Kosovo,71.35,0
 Italy,83.49,2954.14

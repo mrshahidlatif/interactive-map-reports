@@ -1,5 +1,4 @@
 var allData; 
-var existNeighborsInfo = false;
 //Description of variables according to their type 
 var vDepDescriptor="";
 var vIndDescriptor="";

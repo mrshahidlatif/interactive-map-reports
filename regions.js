@@ -1,4 +1,4 @@
-var e1_regions = {	
+var usa_regions = {	
 	"Alaska":"West", 
 	"Alabama":"South", 
 	"Arkansas":"South", 
@@ -52,7 +52,7 @@ var e1_regions = {
 	"Wyoming":"West"
 }
 
-var e2_regions = {
+var europe_regions = {
 	"Belarus":"East",
 	"Bulgaria":"East",
 	"CzechRepublic":"East",

@@ -21,8 +21,11 @@
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <a class="exampleSwitch" id="example1">USA - Deaths and Storms</a>
-        <a class="exampleSwitch" id="example2">Europe - life expectancy and health expenditures</a>
-      </div>
+        <a class="exampleSwitch" id="example2">Europe - Life expectancy </a>
+        <a class="exampleSwitch" id="example3">USA - Accidents</a>
+        <a class="exampleSwitch" id="example4">Europe - Birth rate</a>
+        <a class="exampleSwitch" id="example5">USA - Per capita income</a>
+    </div>
     <!-- <div class="navbar">
        
     </div> -->
@@ -77,6 +80,7 @@
         
         var config="";
         var regions="";
+        var existNeighborsInfo;
         $('body').on('click', '.rID', function() {
            highlightRegion($(this).text());
          })
@@ -98,11 +102,28 @@
     switch (id) {
       case "example1":
         config = e1_config;
-        regions = e1_regions;
+        regions = usa_regions;
+        existNeighborsInfo = true;
         break;
       case "example2":
         config = e2_config;
-        regions = e2_regions;
+        regions = europe_regions;
+        existNeighborsInfo = false;
+        break;
+      case "example3":
+        config = e3_config;
+        regions = usa_regions;
+        existNeighborsInfo = true;
+        break;
+      case "example4":
+        config = e4_config;
+        regions = europe_regions;
+        existNeighborsInfo = false;
+        break;
+      case "example5":
+        config = e5_config;
+        regions = usa_regions;
+        existNeighborsInfo = true;
         break;
     
       default:
