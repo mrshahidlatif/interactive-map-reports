@@ -212,7 +212,8 @@ function generateVis(canvas, config){
       var w = 150, h = 10;
 
       // var key = d3.select("body")
-      var key = svg
+      // var key = svg
+      var key = d3.select("#" + "map")
         .append("g")
         .attr("width", w)
         .attr("height", h)

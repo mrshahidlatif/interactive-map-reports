@@ -16,7 +16,7 @@ var e1_config = {
 
 var e2_config = {
 	"geoRegion": "Europe",
-	"granularity":"countries",
+	"granularity":"country",
 	"regionID" : "id",
 	"indVariable": "health_expenditure",
 	"depVariable": "life_expectancy",

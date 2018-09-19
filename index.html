@@ -98,7 +98,12 @@
   function loadExample(id){
     var data=[];
     // d3.json("config.json", function(d){
-      console.log(id)
+    // console.log(id)
+    
+    //removing contents before loading next example
+    $('p').empty();
+    $('h3').empty();
+
     switch (id) {
       case "example1":
         config = e1_config;

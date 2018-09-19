@@ -188,14 +188,14 @@ function describeOddRegions(l, u, ramp){
 		s += " The " + config.granularity+ " " ;
 		if (u.length > 0){
 			s += stringifyListOfObjectswithColorCoding(uObjects,ramp);
-			if(config.typeDepVariable == "life-loss"){
 				s += " are different from their neighboring "+ config.granularity + " as they "; 
+			if(config.typeDepVariable == "continuous"){
 				s += " suffered a lot more casualties."; 
 			}
 		}
 		if (l.length > 0){
 			s += "The "+ config.granularity + " " + stringifyListOfObjectswithColorCoding(lObjects,ramp);
-			if(config.typeDepVariable == "life-loss"){
+			if(config.typeDepVariable == "continuous"){
 				s += " suffered a lot less casualties."; 
 			}
 		}
