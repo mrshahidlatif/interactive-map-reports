@@ -161,7 +161,7 @@ function generateVis(canvas, config){
               }
             })
               .style("opacity", .2);
-            compareTwoRegions(selectedRegions[0],selectedRegions[1],config);
+            compareTwoRegions(selectedRegions[0],selectedRegions[1],ramp);
             selectedRegions.length=0;
             d3.select("#" + "map").selectAll(".infoText").remove();
             d3.select("#" + "map").selectAll(".infoIcon").remove();
@@ -301,6 +301,19 @@ String.prototype.capitalize = function() {
     }
     else 
       return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+String.prototype.appendPostFix = function () {
+  if (this == "East" || this == "West" || this == "North" || this == "South" || this.substring(this.length-4,this.length-1))
+    return this + "ern";
+}
+
+String.prototype.getPlural = function () {
+  if (this == "state" || this == "State")
+    return this + "s";
+  else if(this == "country" || this == "Country"){
+    return this.substring(0,this.length-2) + "ies";
+  } 
 }
 
 function highlightRegion(name){
