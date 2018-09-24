@@ -78,21 +78,38 @@ var e5_config = {
 	"year":"2015",
 	"geoJSONFile":"us-states.json",
 	"dataFile":"data/pop-pci-usa.csv",
-	"causality": "no"
+	"causality": "yes"
 }
 var e6_config = {
-	"title": "Adolescent birth-rates and use of internet among countries of the World",
+	"title": "Adolescent birth-rates and use of internet among countries of the world",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
-	"indVariable": "internet-user",
-	"depVariable": "adolescent-birth-rate",
+	"indVariable": "internet-users",
+	"depVariable": "adolescent-birth-rates",
 	"unit": "number",
-	"situation": "positive",
+	"situation": "neutral",
 	"typeDepVariable": "demographic-indicator",
 	"typeIndVariable": "quantitative",
 	"year":"2015",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/interneuse-birthrate.csv",
+	"causality": "yes"
+}
+
+var e7_config = {
+	"title": "Obesity (>20 years old, %) and internet users (%) among countries of the world",
+	"geoRegion": "the World",
+	"granularity":"country",
+	"regionID" : "country",
+	"indVariable": "internet-users",
+	"depVariable": "obese-people",
+	"unit": "number",
+	"situation": "negative",
+	"typeDepVariable": "quantitative",
+	"typeIndVariable": "quantitative",
+	"year":"2015",
+	"geoJSONFile":"geography/world.json",
+	"dataFile":"data/internet-user-obesity.csv",
 	"causality": "yes"
 }

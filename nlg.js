@@ -3,6 +3,7 @@ var allData;
 var vDepDescriptor="";
 var vIndDescriptor="";
 var verb = "";
+var corr = 0; 
 //------------------------------
 //Thresold parameters 
 //------------------------------
@@ -28,12 +29,15 @@ function generateNarrative(data,config){
 	//Description of dependent variable according to their type 
 	if (config.typeDepVariable == "casualties" || config.typeDepVariable == "incidents"){
 		vDepDescriptor = " number of "
-		// verb = " reports ";
 		depVerb = " " + verb_incidents[Math.floor(Math.random()*verb_incidents.length)] + " ";
 	}
 	else if (config.typeDepVariable == "demographic-indicator") {
 		vDepDescriptor = "";
 		depVerb = " " + verb_demographic_indicator[Math.floor(Math.random()*verb_demographic_indicator.length)] + " ";
+	}
+	else if (config.typeDepVariable == "quantitative"){
+		vDepDescriptor = " number of ";
+		depVerb = " " + verb_quantitative[Math.floor(Math.random()*verb_quantitative.length)] + " "; 
 	}
 
 	//Description of independent variable according to their type 
@@ -159,13 +163,15 @@ function generateNarrative(data,config){
 	//Paragraph describing relationship among variables 
 	var rText=""; 
 	if(config.causality=="yes"){ //Only print if there is causality in the variables
-		var corr = computeCorrelation(allData);
-		console.log(corr); 
+		corr = computeCorrelation(allData);
+		// console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
-			rText += " Overall, large "+ vIndDescriptor + config.indVariable + " are assoicated with large " + vDepDescriptor + config.depVariable+ ".";
+			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
+			rText += "&mdash; higher the " + vIndDescriptor + config.indVariable + ", higher are the " + vDepDescriptor + config.depVariable + ".";
 		}
 		else if (corr < NEGATIVE_CORRELATION){
-			rText += " Overall, large "+ vIndDescriptor + config.indVariable + " are assoicated with small " + vDepDescriptor + config.depVariable+ ".";
+			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
+			rText += "&mdash; higher the " + vIndDescriptor + config.indVariable + ", lower are the " + vDepDescriptor + config.depVariable + ".";
 		}
 	} 
 	rText += generateRegionalCorrelationText(distinctRegions, regionGroups, config);
@@ -247,7 +253,7 @@ function stringifyListOfObjects(list){
 function stringifyBivariateOutliers(list,ramp){
 	//list = list of bivariate outliers
 	var s = ""; 
-	// console.log(list);
+	console.log(list[0]);
 
 	var olDepV = getUpperUnivariateOutliers(allData, config.depVariable);
 	var olIndV = getUpperUnivariateOutliers(allData, config.indVariable);
@@ -261,9 +267,12 @@ function stringifyBivariateOutliers(list,ramp){
 		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
 		s += " reports high " + vDepDescriptor + " " +config.depVariable + " as well as high "+ vIndDescriptor + " "+ config.indVariable + "." ;
 	}
-	//removing the outlier that was stated
-	list = list.filter(function(d){return d[config.regionID] != list[0][config.regionID];});
-	
+	//removing the outlier that was stated - only remove if there are more that 2 bivariate outliers
+	if (list.length>=2){
+		list = list.filter(function(d){return d[config.regionID] != list[0][config.regionID];});
+	}
+
+	console.log(list);
 	//Case 2 - outlier in dependent variable but not in independent variable
 	if(isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
 		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" + list[0][config.indVariable]+"), ";
@@ -690,7 +699,7 @@ function Create2DArray(rows) {
 }
 function generateRegionalCorrelationText(dRs,rGs, config){
 	var text = "";
-	// console.log(rGs);
+	// console.log(dRs);
 	//Correlations among regions 
 	var corr_arr = [] ; 
 	for (var i=0;i<rGs.length;i++){
@@ -698,23 +707,22 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 		if (objs.length >2)
 			corr_arr[i] = ss.sampleCorrelation(ListOfObjToArray(objs,config.depVariable), ListOfObjToArray(objs,config.indVariable));
 	}
-	console.log(corr_arr);
+	// console.log(corr_arr);
 
 	var pos_corr_arr = []; 
 	var neg_corr_arr = [];
 
 	 for(var i=0;i<corr_arr.length;i++){
-		if(corr_arr[i] > 0.5){
+		if(corr_arr[i] > 0.75){
 			pos_corr_arr.push(i);
 		}
-		if(corr_arr[i] < -0.5){
+		if(corr_arr[i] < -0.75){
 			neg_corr_arr.push(i);
 		}
 	}
-	// console.log(pos_corr_arr);
+	// console.log(neg_corr_arr);
 	// console.log(dRs[pos_corr_arr[0]])
-	
-	if(config.causality=="yes" && pos_corr_arr.length>0){
+	if(config.causality=="yes" && pos_corr_arr.length>0 && corr < POSITIVE_CORRELATION){
 		text += " Higher "+ vDepDescriptor + config.depVariable + " are associated with higher " + vIndDescriptor + config.indVariable +" among "; 
 		if(pos_corr_arr.length==1)
 			text += dRs[pos_corr_arr[0]].appendPostFix() + " " +  config.granularity.getPlural() + ".";
@@ -722,28 +730,34 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 			text += dRs[pos_corr_arr[0]].appendPostFix() + " and " + dRs[pos_corr_arr[1]].appendPostFix() + " " + config.granularity.getPlural() + ".";
 		else {
 			text = ""; 
-			// for(var i=0;i<pos_corr_arr.length; i++){
-			// 	if (i==pos_corr_arr.length-1){
-			// 		text+= "and "+dRs[pos_corr_arr[i]] + " "+ config.granularity;
-			// 	}
-			// 	else {
-			// 		text+= dRs[pos_corr_arr[i]]+ ", ";
-			// 	}
-			// }
-		}
-		 
+		}	 
 	}
-	if(config.causality=="yes" && neg_corr_arr.length>0){
+	// console.log(neg_corr_arr);
+	if(config.causality=="yes" && neg_corr_arr.length>0 && corr>NEGATIVE_CORRELATION){
 		text += " Lower " + vDepDescriptor + config.depVariable + " are associated with higher "+ vIndDescriptor + config.indVariable +" among "; 
 		if(neg_corr_arr.length==1)
-			text += dRs[pos_corr_arr[0]].appendPostFix() + config.granularity.getPlural() + ".";
+			text += dRs[neg_corr_arr[0]].appendPostFix() + " " + config.granularity.getPlural() + ".";
 		else if(neg_corr_arr.length==2)
 			text += dRs[neg_corr_arr[0]].appendPostFix() + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity.getPlural() + ".";
 		// for(var i=0;i<neg_corr_arr.length; i++){
 		// 	text += "";
 		// } 
 	}
-
+	// Printes only if the overall correlation text is generated before
+	if (corr > POSITIVE_CORRELATION){
+		text += " This association is even stronger among ";
+		if(pos_corr_arr.length==1)
+			text += dRs[pos_corr_arr[0]].appendPostFix() + " " +  config.granularity.getPlural() + ".";
+		else if(pos_corr_arr.length==2)
+			text += dRs[pos_corr_arr[0]].appendPostFix() + " and " + dRs[pos_corr_arr[1]].appendPostFix() + " " + config.granularity.getPlural() + ".";
+	}
+	else if (corr < NEGATIVE_CORRELATION){
+		text += " This association is even stronger among ";
+		if(neg_corr_arr.length==1)
+			text += dRs[neg_corr_arr[0]].appendPostFix() + " " + config.granularity.getPlural() + ".";
+		else if(neg_corr_arr.length==2)
+			text += dRs[neg_corr_arr[0]].appendPostFix() + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity.getPlural() + ".";
+	}
 	return text;
 
 }

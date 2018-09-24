@@ -29,9 +29,9 @@ function generateVis(canvas, config){
          highColor = '#ff0000'
         break;
     case "neutral":
-         dotColor = '#04f2f2'
-         lowColor = '#ccc9c9'
-         highColor = '#424040'
+         dotColor = '#FF8000'
+         lowColor = '#deebf7'
+         highColor = '#3182bd'
         break;
     default:
       // statements_def
@@ -309,8 +309,16 @@ String.prototype.capitalize = function() {
 }
 
 String.prototype.appendPostFix = function () {
-  if (this == "East" || this == "West" || this == "North" || this == "South" || this.substring(this.length-4,this.length-1))
+  // console.log(this);
+  // console.log(this.substring(this.length-2,this.length));
+
+  if (this == "East" || this == "West" || this == "North" || this == "South" || this.substring(this.length-2,this.length)=="st")
     return this + "ern";
+  else if (this.substr(this.length-1,this.length-1)=="a")
+    return this + "n";
+  else if (this.substr(this.length-2,this.length-1)=="pe")
+    return this + "an"; 
+  else return this; 
 }
 
 String.prototype.getPlural = function () {

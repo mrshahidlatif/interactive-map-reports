@@ -26,6 +26,7 @@
         <a class="exampleSwitch" id="example4">Europe - Birth rate</a>
         <a class="exampleSwitch" id="example5">USA - Per capita income</a>
         <a class="exampleSwitch" id="example6">World - Adolescent birth rate</a>
+        <a class="exampleSwitch" id="example7">World - Obesity</a>
     </div>
     <!-- <div class="navbar">
        
@@ -133,6 +134,11 @@
         break;
       case "example6":
         config = e6_config;
+        regions = world_regions;
+        existNeighborsInfo = false;
+        break;
+      case "example7":
+        config = e7_config;
         regions = world_regions;
         existNeighborsInfo = false;
         break;
