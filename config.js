@@ -80,3 +80,19 @@ var e5_config = {
 	"dataFile":"data/pop-pci-usa.csv",
 	"causality": "no"
 }
+var e6_config = {
+	"title": "Adolescent birth-rates and use of internet among countries of the World",
+	"geoRegion": "the World",
+	"granularity":"country",
+	"regionID" : "country",
+	"indVariable": "internet-user",
+	"depVariable": "adolescent-birth-rate",
+	"unit": "number",
+	"situation": "positive",
+	"typeDepVariable": "demographic-indicator",
+	"typeIndVariable": "quantitative",
+	"year":"2015",
+	"geoJSONFile":"geography/world.json",
+	"dataFile":"data/interneuse-birthrate.csv",
+	"causality": "yes"
+}

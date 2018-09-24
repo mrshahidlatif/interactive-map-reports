@@ -25,6 +25,7 @@
         <a class="exampleSwitch" id="example3">USA - Accidents</a>
         <a class="exampleSwitch" id="example4">Europe - Birth rate</a>
         <a class="exampleSwitch" id="example5">USA - Per capita income</a>
+        <a class="exampleSwitch" id="example6">World - Adolescent birth rate</a>
     </div>
     <!-- <div class="navbar">
        
@@ -129,6 +130,11 @@
         config = e5_config;
         regions = usa_regions;
         existNeighborsInfo = true;
+        break;
+      case "example6":
+        config = e6_config;
+        regions = world_regions;
+        existNeighborsInfo = false;
         break;
     
       default:

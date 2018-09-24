@@ -53,6 +53,11 @@ function generateVis(canvas, config){
     .translate([width / 2, height / 2]) // translate to center of screen
     .scale(700); // scale things down so see entire US
   }
+  else if (config.geoRegion == "the World"){
+    var projection = d3.geoMercator()
+    .scale(width*0.3)
+    .translate([width/2, height/2])
+  }
   else{
     var projection = d3.geoStereographic()
     .scale(width*1.5)
@@ -90,7 +95,7 @@ function generateVis(canvas, config){
     var minVal = d3.min(dataArray)
     var maxVal = d3.max(dataArray)
     var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor])
-    var radius = d3.scaleLinear().domain([d3.min(dataArray2),d3.max(dataArray2)]).range([1,15])
+    var area = d3.scaleLinear().domain([d3.min(dataArray2),d3.max(dataArray2)]).range([1,225])
     
     // Load GeoJSON data and merge with states data
     d3.json(geoJSON, function(json) {
@@ -184,7 +189,7 @@ function generateVis(canvas, config){
         .append("circle")
         .attr("class","dots")
         .attr("r", function (d){
-          return radius(d.properties.value2)
+          return Math.sqrt(area(d.properties.value2)*2/Math.PI)
         })
         .attr("fill",dotColor)
         .attr("transform",function(d){

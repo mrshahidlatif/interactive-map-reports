@@ -53,7 +53,7 @@ function generateNarrative(data,config){
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//Introductor paragraph
-	var intro = "The map shows the "+ vDepDescriptor + config.depVariable + ", encoded as the radius of the dot (";
+	var intro = "The map shows the "+ vDepDescriptor + config.depVariable + ", encoded as the area of the dot (";
 	intro += '<svg id="inlineDot" width="20px" height="20"></svg>),'
 
 	intro += (config.causality== "yes") ? " caused by " : " and "; 
