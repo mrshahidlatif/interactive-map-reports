@@ -20,35 +20,46 @@ function generateNarrative(data,config){
 	// console.log(dotColor);
 	
 	//Adding title to the report
-	document.getElementById("reportTitle").innerHTML = config.depVariable.toProperCase() + " and " + config.indVariable + ", "+ config.geoRegion + " ("+ config.year+")"; 
+	// document.getElementById("reportTitle").innerHTML = config.depVariable.toProperCase() + " and " + config.indVariable + ", "+ config.geoRegion + " ("+ config.year+")"; 
+	$("#reportTitle").html(config.title);
 
 	//verbs 
 
-	//Description of variables according to their type 
-	if (config.typeDepVariable == "continuous" || config.typeDepVariable == "casualties" || config.typeDepVariable == "incidents"){
+	//Description of dependent variable according to their type 
+	if (config.typeDepVariable == "casualties" || config.typeDepVariable == "incidents"){
 		vDepDescriptor = " number of "
-		verb = " reports ";
+		// verb = " reports ";
+		depVerb = " " + verb_incidents[Math.floor(Math.random()*verb_incidents.length)] + " ";
 	}
 	else if (config.typeDepVariable == "demographic-indicator") {
-		vDepDescriptor = ""
-		verb = " has ";
+		vDepDescriptor = "";
+		depVerb = " " + verb_demographic_indicator[Math.floor(Math.random()*verb_demographic_indicator.length)] + " ";
 	}
 
-	if (config.typeIndVariable == "continuous" || config.typeIndVariable == "casualties"){
-		vIndDescriptor = " number of "
+	//Description of independent variable according to their type 
+	if (config.typeIndVariable == "quantitative" ){
+		vIndDescriptor = " number of ";
+		indVerb = " " + verb_quantitative[Math.floor(Math.random()*verb_quantitative.length)] + " "; 
 	}
-	else if (config.typeIndVariable == "discrete") {
-		vIndDescriptor = " values of "
+	else if (config.typeIndVariable == "casualties" || config.typeIndVariable == "incidents"){
+		vIndDescriptor = " number of ";
+		indVerb = " " + verb_incidents[Math.floor(Math.random()*verb_incidents.length)] + " ";
+
+	}
+	else if (config.typeIndVariable == "monetary") {
+		vIndDescriptor = " values of ";
 	}
 
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//Introductor paragraph
-	var intro = "The map shows the "+ vDepDescriptor + config.depVariable +" ";
-	intro += '<svg id="inlineDot" width="20px" height="20"></svg>'
+	var intro = "The map shows the "+ vDepDescriptor + config.depVariable + ", encoded as the radius of the dot (";
+	intro += '<svg id="inlineDot" width="20px" height="20"></svg>),'
 
 	intro += (config.causality== "yes") ? " caused by " : " and "; 
-	intro += config.indVariable + '<svg id="inlineLegend" width="70px" height="15"></svg>' + " across the different "+ config.granularity.getPlural() + " of "  + config.geoRegion + " during " + config.year + ".";
+	intro += (vDepDescriptor == vIndDescriptor) ? "": vIndDescriptor ;
+	
+	intro += config.indVariable + ' <svg id="inlineLegend" width="70px" height="15"></svg>' + " across the different "+ config.granularity.getPlural() + " of "  + config.geoRegion + " during " + config.year + ".";
 
 	$("#intro").html(intro);
 	
@@ -193,7 +204,7 @@ function describeOddRegions(l, u, ramp){
 		s += " The " + config.granularity+ " " ;
 		if (u.length > 0){
 			s += stringifyListOfObjectswithColorCoding(uObjects,ramp);
-				s += " are different from their neighboring "+ config.granularity + " as they "; 
+				s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
 			if(config.typeDepVariable == "casualties"){
 				s += " suffered a lot more casualties."; 
 			}
@@ -255,7 +266,7 @@ function stringifyBivariateOutliers(list,ramp){
 	
 	//Case 2 - outlier in dependent variable but not in independent variable
 	if(isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
-		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" + list[0][config.indVariable]+") ";
+		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" + list[0][config.indVariable]+"), ";
 		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
 		s += " shows high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+").";
 	}
@@ -301,7 +312,7 @@ function stringifyList_v2(list,ramp){
 
 	switch (list.length) {
 		case 1:  
-			string += " Other "+ config.granularity.getPlural() + " showing high ";
+			string += " Other "+ config.granularity + " showing high ";
 			string += vDepDescriptor + " " + config.depVariable + " is " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable] + ")" ;
 			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable+"." : ".";
 			break;
@@ -364,7 +375,7 @@ function explainOnDemand(name,config,ramp){
 
 	//Based on dependant variable
 	exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + name.toProperCase()+ '</span>'; 
-	exp += getVerb("s","past",verb) ;
+	exp += getVerb("s","past",depVerb) ;
 
 
 	if(value_dV == getMin(allData,config.depVariable)) {
@@ -400,7 +411,7 @@ function explainOnDemand(name,config,ramp){
 		exp += " and below average (" + value_iV + ") " + config.indVariable;
 	}
 
-	exp += " when compared to the other " + config.granularity + "."; 
+	exp += " when compared to the other " + config.granularity.getPlural() + "."; 
 	// console.log(selectedRegion);
 	allData.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 	var rank = allData.findIndex(x => x[config.regionID].toLowerCase() == name.toLowerCase()) +1; 
@@ -420,14 +431,14 @@ function explainOnDemand(name,config,ramp){
 			exp += " Compared to its neighbors, ";
 			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
 			exp +=  ", " + name.toProperCase();
-			exp += getVerb("s","past", verb) + " more " + config.depVariable + ".";
+			exp += getVerb("s","past", depVerb) + " more " + config.depVariable + ".";
 		}
 		else if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="lower"){
 			var objs = getObjectsByNames(allData, neighbors); 
 			exp += " Compared to its neighbors, ";
 			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
 			exp += ", " + name.toProperCase();
-			exp += getVerb("s","past", verb) ;
+			exp += getVerb("s","past", depVerb) ;
 			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
 			exp += config.depVariable + ".";
 		}
@@ -704,11 +715,11 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 	// console.log(dRs[pos_corr_arr[0]])
 	
 	if(config.causality=="yes" && pos_corr_arr.length>0){
-		text += " Strong positive correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
+		text += " Higher "+ vDepDescriptor + config.depVariable + " are associated with higher " + vIndDescriptor + config.indVariable +" among "; 
 		if(pos_corr_arr.length==1)
-			text += dRs[pos_corr_arr[0]].appendPostFix() + " " +  config.granularity+ ".";
+			text += dRs[pos_corr_arr[0]].appendPostFix() + " " +  config.granularity.getPlural() + ".";
 		else if(pos_corr_arr.length==2)
-			text += dRs[pos_corr_arr[0]].appendPostFix() + " and " + dRs[pos_corr_arr[1]].appendPostFix() + " " + config.granularity + ".";
+			text += dRs[pos_corr_arr[0]].appendPostFix() + " and " + dRs[pos_corr_arr[1]].appendPostFix() + " " + config.granularity.getPlural() + ".";
 		else {
 			text = ""; 
 			// for(var i=0;i<pos_corr_arr.length; i++){
@@ -723,11 +734,11 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 		 
 	}
 	if(config.causality=="yes" && neg_corr_arr.length>0){
-		text += " Negative correlation is seen between " + config.depVariable + " and "+ config.indVariable +" among "; 
+		text += " Lower " + vDepDescriptor + config.depVariable + " are associated with higher "+ vIndDescriptor + config.indVariable +" among "; 
 		if(neg_corr_arr.length==1)
-			text += dRs[pos_corr_arr[0]].appendPostFix() + config.granularity + ".";
+			text += dRs[pos_corr_arr[0]].appendPostFix() + config.granularity.getPlural() + ".";
 		else if(neg_corr_arr.length==2)
-			text += dRs[neg_corr_arr[0]].appendPostFix() + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity + ".";
+			text += dRs[neg_corr_arr[0]].appendPostFix() + " and " + dRs[neg_corr_arr[1]] + " " + config.granularity.getPlural() + ".";
 		// for(var i=0;i<neg_corr_arr.length; i++){
 		// 	text += "";
 		// } 
@@ -753,16 +764,16 @@ function generateSpatialTrendText(dRs,rGs, config){
 
 		switch (max_d_index) {
 			case 0:
-				text += dRs[0].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				text += dRs[0].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", depVerb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 				break;
 			case 1:
-				text += dRs[1].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				text += dRs[1].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", depVerb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 				break;
 			case 2:
-				text += dRs[2].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				text += dRs[2].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", depVerb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 				break;
 			case 3:
-				text += dRs[3].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher "+ vDepDescriptor + config.depVariable ; 
+				text += dRs[3].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", depVerb)+ " higher "+ vDepDescriptor + config.depVariable ; 
 				break;
 		}
 	}
@@ -786,27 +797,27 @@ function generateSpatialTrendText(dRs,rGs, config){
 
 		switch (max_i_index) {
 			case 0:
-				text += dRs[0].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ; 
+				text += dRs[0].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", indVerb)+ " higher " + vIndDescriptor + config.indVariable ; 
 				if(max_d_index == 0){
-					text = " "+ dRs[0].appendPostFix() + " " + config.granularity.getPlural() + " show higher " + vDepDescriptor +  config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity; 
+					text = " "+ dRs[0].appendPostFix() + " " + config.granularity.getPlural() + getVerb("s","past",indVerb) + " higher " + vDepDescriptor +  config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity.getPlural(); 
 				}
 				break;
 			case 1:
-				text += dRs[1].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
+				text += dRs[1].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", indVerb)+ " higher " + vIndDescriptor + config.indVariable ;
 				if(max_d_index == 1){
-					text = " "+ dRs[1].appendPostFix() + " " + config.granularity.getPlural() + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity; 
+					text = " "+ dRs[1].appendPostFix() + " " + config.granularity.getPlural() + getVerb("s","past",depVerb) +" higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity.getPlural(); 
 				} 
 				break;
 			case 2:
-				text += dRs[2].appendPostFix() + " "+ config.granularity.getPlural() + getVerb("p","past", verb)+ " higher " + vIndDescriptor +config.indVariable ;
+				text += dRs[2].appendPostFix() + " "+ config.granularity.getPlural() + getVerb("p","past", indVerb)+ " higher " + vIndDescriptor +config.indVariable ;
 				if(max_d_index == 2){
-					text = " "+  dRs[2].appendPostFix() + " "+ config.granularity.getPlural() + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity; 
+					text = " "+  dRs[2].appendPostFix() + " "+ config.granularity.getPlural() + getVerb("s","past",indVerb) + " higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity.getPlural(); 
 				}
 				break;
 			case 3:
-				text += dRs[3].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", verb)+ " higher " + vIndDescriptor + config.indVariable ;
+				text += dRs[3].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", indVerb)+ " higher " + vIndDescriptor + config.indVariable ;
 				if(max_d_index == 3){
-					text =  " "+ dRs[3].appendPostFix() + " "+ config.granularity.getPlural() + " show higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity; 
+					text =  " "+ dRs[3].appendPostFix() + " "+ config.granularity.getPlural() + getVerb("s","past",indVerb) + " higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity; 
 				}
 				break;
 		}
@@ -862,8 +873,7 @@ function getTopNItems(items, minN, maxN, variable) {
 function getVerb(sub, time, verb){
 	//sub = s, p, 
 	// time = present, past, 
-
-	return verb; 
+	return verb;
 
 }
 function makeInlineLegend(canvas,h,w){

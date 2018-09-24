@@ -1,4 +1,5 @@
 var e1_config = {
+	"title": "Fatalties caused by storms in the USA, 2017",
 	"geoRegion": "the United States of America",
 	"granularity":"state",
 	"regionID" : "id",
@@ -15,13 +16,14 @@ var e1_config = {
 }
 
 var e2_config = {
+	"title": "Average life expectancy and spendings on health across Europe, 2018",
 	"geoRegion": "Europe",
 	"granularity":"country",
 	"regionID" : "id",
 	"indVariable": "health_expenditure",
 	"depVariable": "life_expectancy",
 	"typeDepVariable": "demographic-indicator",
-	"typeIndVariable": "money",
+	"typeIndVariable": "monetary",
 	"situation": "positive",
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
@@ -30,6 +32,7 @@ var e2_config = {
 }
 
 var e3_config = {
+	"title": "Pedestrian and bicyclist deaths in the USA, 2008",
 	"geoRegion": "the United States of America",
 	"granularity":"state",
 	"regionID" : "id",
@@ -46,13 +49,14 @@ var e3_config = {
 }
 
 var e4_config = {
+	"title": "Storks deliver babies, Europe, 2000",
 	"geoRegion": "Europe",
 	"granularity":"country",
 	"regionID" : "Country",
 	"indVariable": "Storks",
 	"depVariable": "Birth-rate",
 	"typeDepVariable": "demographic-indicator",
-	"typeIndVariable": "continuous",
+	"typeIndVariable": "quantitative",
 	"situation": "neutral",
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
@@ -61,6 +65,7 @@ var e4_config = {
 }
 
 var e5_config = {
+	"title": "Per capita income in the USA, 2015",
 	"geoRegion": "the United States of America",
 	"granularity":"state",
 	"regionID" : "state",
@@ -69,7 +74,7 @@ var e5_config = {
 	"unit": "number",
 	"situation": "positive",
 	"typeDepVariable": "demographic-indicator",
-	"typeIndVariable": "discrete",
+	"typeIndVariable": "quantitative",
 	"year":"2015",
 	"geoJSONFile":"us-states.json",
 	"dataFile":"data/pop-pci-usa.csv",

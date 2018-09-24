@@ -312,7 +312,7 @@ String.prototype.getPlural = function () {
   if (this == "state" || this == "State")
     return this + "s";
   else if(this == "country" || this == "Country"){
-    return this.substring(0,this.length-2) + "ies";
+    return this.substring(0,this.length-1) + "ies";
   } 
 }
 
