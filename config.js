@@ -58,11 +58,13 @@ var e4_config = {
 	"depVariable": "Birth-rate",
 	"typeDepVariable": "demographic-indicator",
 	"typeIndVariable": "quantitative",
+	"unitDepVariable": "thousands, per year",
+	"unitIndVariable": "number of pairs",
 	"situation": "neutral",
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
 	"dataFile":"data/storks-birth-data.csv",
-	"causality":"no"
+	"causality":"yes"
 }
 
 var e5_config = {

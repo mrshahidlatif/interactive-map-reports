@@ -173,11 +173,13 @@ function generateNarrative(data,config){
 		// console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
 			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
-			rText += "&mdash; higher the " + vIndDescriptor + config.indVariable + ", higher are the " + vDepDescriptor + config.depVariable + ".";
+			rText += "&mdash;higher the " + vIndDescriptor + config.indVariable + "," ;
+			rText += (config.typeDepVariable=="demographic-indicator" && config.situation == "positive") ? " better is the " : " higher are the " ;
+			rText += vDepDescriptor + config.depVariable + ".";
 		}
 		else if (corr < NEGATIVE_CORRELATION){
 			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
-			rText += "&mdash; higher the " + vIndDescriptor + config.indVariable + ", lower are the " + vDepDescriptor + config.depVariable + ".";
+			rText += "&mdash;higher the " + vIndDescriptor + config.indVariable + ", lower are the " + vDepDescriptor + config.depVariable + ".";
 		}
 	} 
 	rText += generateRegionalCorrelationText(distinctRegions, regionGroups, config);
@@ -328,12 +330,12 @@ function stringifyList_v2(list,ramp){
 	switch (list.length) {
 		case 1:  
 			string += " Other "+ config.granularity + " showing high ";
-			string += vDepDescriptor + " " + config.depVariable + " is " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable] + ")" ;
-			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable] + " " + config.indVariable+"." : ".";
+			string += vDepDescriptor + " " + config.depVariable + " is " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable].toLocaleString() + ")" ;
+			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable].toLocaleString() + " " + config.indVariable+"." : ".";
 			break;
 		case 2:
 			string += " Other "+ config.granularity.getPlural() + " showing high ";
-			string += vDepDescriptor + " " + config.depVariable + " are " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' + " (" + list[0][config.depVariable] + ")" + " and "+ '<span class="rID" style="background-color:'+ramp(list[1][config.indVariable])+'">' + list[1][config.regionID].toProperCase()+ '</span>' + " (" + list[1][config.depVariable] + ").";
+			string += vDepDescriptor + " " + config.depVariable + " are " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' + " (" + list[0][config.depVariable].toLocaleString() + ")" + " and "+ '<span class="rID" style="background-color:'+ramp(list[1][config.indVariable])+'">' + list[1][config.regionID].toProperCase()+ '</span>' + " (" + list[1][config.depVariable] + ").";
 			break;
 		default:
 			string += " Other "+ config.granularity.getPlural() + " showing high ";

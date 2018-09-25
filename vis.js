@@ -79,6 +79,7 @@ function generateVis(canvas, config){
     // .append("svg")
     .attr("width", width-margin.left-margin.right)
     .attr("height", height-margin.top - margin.bottom)
+    .on("click", function(d){resetShading()})
     .call(d3.zoom().on("zoom", function () {
               svg.attr("transform", d3.event.transform)
       }))
@@ -184,6 +185,7 @@ function generateVis(canvas, config){
             selectedRegions.length=0; 
             selectedRegions.push(d.properties.name);
           }
+          d3.event.stopPropagation();
         });
 
       // Drawing the second variable on the map
@@ -291,6 +293,9 @@ function generateVis(canvas, config){
     });
   });
 
+}
+function resetShading(){
+   var regions = d3.select("#" + "map").selectAll("path").style("opacity", 1);
 }
 
 // https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
