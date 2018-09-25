@@ -52,18 +52,24 @@ function generateNarrative(data,config){
 	}
 	else if (config.typeIndVariable == "monetary") {
 		vIndDescriptor = " values of ";
+		indVerb = " " + verb_monetary[Math.floor(Math.random()*verb_monetary.length)] + " ";
 	}
 
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 
 	//Introductor paragraph
-	var intro = "The map shows the "+ vDepDescriptor + config.depVariable + ", encoded as the area of the dot (";
+	var intro = "The map shows the "+ vDepDescriptor + config.depVariable ;
+	intro += (config.unitIndVariable != undefined) ? " (" + config.unitDepVariable + ")" : ""; 
+	intro += ", encoded as the area of the dots (";
 	intro += '<svg id="inlineDot" width="20px" height="20"></svg>),'
 
-	intro += (config.causality== "yes") ? " caused by " : " and "; 
+	// intro += (config.causality== "yes") ? " caused by " : " and "; 
+	intro += " and ";
 	intro += (vDepDescriptor == vIndDescriptor) ? "": vIndDescriptor ;
 	
-	intro += config.indVariable + ' <svg id="inlineLegend" width="70px" height="15"></svg>' + " across the different "+ config.granularity.getPlural() + " of "  + config.geoRegion + " during " + config.year + ".";
+	intro += config.indVariable ;
+	intro += (config.unitIndVariable != undefined ) ? " (" + config.unitIndVariable + ")" : ""; 
+	intro += ' <svg id="inlineLegend" width="70px" height="15"></svg>' + " across the different "+ config.granularity.getPlural() + " of "  + config.geoRegion + " during " + config.year + ".";
 
 	$("#intro").html(intro);
 	
@@ -93,12 +99,12 @@ function generateNarrative(data,config){
 	var moreRegionsWithMaxValueString = "Other similar regions are " + stringifyListOfObjects(regionsWithMaxValues);
 	
 
-	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV + ", and it "; 
+	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + ", and it "; 
 	focusVText += " varies from ";
-	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable);
+	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString();
 	focusVText += " in " + '<span class="rID" style="background-color:'+ramp(getMin(allData, config.depVariable))+'">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
 	focusVText += (regionsWithMinValues.length > 1) ? '<span title="'+ moreRegionsWithMinValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
-	focusVText += " to " + getMax(allData, config.depVariable) + " in " + '<span class="rID" style="background-color:'+ramp(getMax(allData, config.indVariable))+'">'+ maxRegion[config.regionID].toProperCase() + '</span>';
+	focusVText += " to " + getMax(allData, config.depVariable).toLocaleString() + " in " + '<span class="rID" style="background-color:'+ramp(getMax(allData, config.indVariable))+'">'+ maxRegion[config.regionID].toProperCase() + '</span>';
 	focusVText += (regionsWithMaxValues.length > 1) ? '<span title="'+ moreRegionsWithMaxValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
 	focusVText += " across " + config.geoRegion +".";
 
@@ -265,7 +271,7 @@ function stringifyBivariateOutliers(list,ramp){
 	if(isExist(olDepV, list[0][config.regionID]) && isExist(olIndV, list[0][config.regionID])){
 		s += " In comparison to the other " + config.granularity.getPlural() + ", ";
 		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
-		s += " reports high " + vDepDescriptor + " " +config.depVariable + " as well as high "+ vIndDescriptor + " "+ config.indVariable + "." ;
+		s += getVerb("s","past",depVerb) + " high " + vDepDescriptor + " " +config.depVariable + " as well as high "+ vIndDescriptor + " "+ config.indVariable + "." ;
 	}
 	//removing the outlier that was stated - only remove if there are more that 2 bivariate outliers
 	if (list.length>=2){
@@ -666,7 +672,7 @@ function analyse(data, config){
 		arr2D[i][0] = +data[i][config.indVariable];
 		arr2D[i][1] = +data[i][config.depVariable];
 	}
-	// console.log(arr2D);
+	console.log(arr2D);
 	var mDistances = mahalanobis(arr2D);
 	// console.log(mDistances);
 	for (var i=0;i<mDistances.length;i++){
@@ -745,14 +751,14 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 	}
 	// Printes only if the overall correlation text is generated before
 	if (corr > POSITIVE_CORRELATION){
-		text += " This association is even stronger among ";
+		text += " This relationship is even stronger among ";
 		if(pos_corr_arr.length==1)
 			text += dRs[pos_corr_arr[0]].appendPostFix() + " " +  config.granularity.getPlural() + ".";
 		else if(pos_corr_arr.length==2)
 			text += dRs[pos_corr_arr[0]].appendPostFix() + " and " + dRs[pos_corr_arr[1]].appendPostFix() + " " + config.granularity.getPlural() + ".";
 	}
 	else if (corr < NEGATIVE_CORRELATION){
-		text += " This association is even stronger among ";
+		text += " This relationship is even stronger among ";
 		if(neg_corr_arr.length==1)
 			text += dRs[neg_corr_arr[0]].appendPostFix() + " " + config.granularity.getPlural() + ".";
 		else if(neg_corr_arr.length==2)

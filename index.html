@@ -10,7 +10,6 @@
   <script src="geo_neighbors.js"></script>
   <script src="regions.js"></script>
   <script src="config.js"></script>
-
   <script src="vis.js"></script>
   <script src="nlg.js"></script>
   <script src="dictionary.js"></script>
@@ -27,6 +26,7 @@
         <a class="exampleSwitch" id="example5">USA - Per capita income</a>
         <a class="exampleSwitch" id="example6">World - Adolescent birth rate</a>
         <a class="exampleSwitch" id="example7">World - Obesity</a>
+        <a class="exampleSwitch" id="example8">World - alcohol consumption and cancer</a>
     </div>
     <!-- <div class="navbar">
        
@@ -139,6 +139,11 @@
         break;
       case "example7":
         config = e7_config;
+        regions = world_regions;
+        existNeighborsInfo = false;
+        break;
+      case "example8":
+        config = e8_config;
         regions = world_regions;
         existNeighborsInfo = false;
         break;

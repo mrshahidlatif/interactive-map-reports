@@ -1,11 +1,10 @@
 var e1_config = {
-	"title": "Fatalties caused by storms in the USA, 2017",
+	"title": "Fatalities caused by storms in the USA, 2017",
 	"geoRegion": "the United States of America",
 	"granularity":"state",
 	"regionID" : "id",
 	"indVariable": "storms",
 	"depVariable": "deaths",
-	"unit": "number",
 	"situation": "negative",
 	"typeDepVariable": "casualties",
 	"typeIndVariable": "incidents",
@@ -24,11 +23,13 @@ var e2_config = {
 	"depVariable": "life_expectancy",
 	"typeDepVariable": "demographic-indicator",
 	"typeIndVariable": "monetary",
+	"unitDepVariable": "years",
+	"unitIndVariable": "USD, per houshold",
 	"situation": "positive",
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
 	"dataFile":"data/health-life-expectancy.csv",
-	"causality": "no"
+	"causality": "yes"
 }
 
 var e3_config = {
@@ -111,5 +112,22 @@ var e7_config = {
 	"year":"2015",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/internet-user-obesity.csv",
+	"causality": "yes"
+}
+
+var e8_config = {
+	"title": "Deaths due to cancer (per 100 000 population) and alcohol consumption, 2005",
+	"geoRegion": "the World",
+	"granularity":"country",
+	"regionID" : "country",
+	"indVariable": "alcohol-consumption",
+	"depVariable": "deaths-due-to-cancer",
+	"unit": "number",
+	"situation": "negative",
+	"typeDepVariable": "quantitative",
+	"typeIndVariable": "quantitative",
+	"year":"2005",
+	"geoJSONFile":"geography/world.json",
+	"dataFile":"data/cancer-alcohol-deaths.csv",
 	"causality": "yes"
 }

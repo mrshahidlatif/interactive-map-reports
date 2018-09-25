@@ -139,7 +139,11 @@ function generateVis(canvas, config){
         .attr("d", path)
         .style("stroke", "#000")
         .style("stroke-width", "1")
-        .style("fill", function(d) { return ramp(d.properties.value) })
+        .style("fill", function(d) { 
+          if (d.properties.value != undefined)
+            return ramp(d.properties.value);
+          else return "#bdbdbd";
+        })
          //Adding mouseevents
         .on("mouseover", function(d) {
           // d3.select(this).transition().duration(300).style("opacity", 1);
