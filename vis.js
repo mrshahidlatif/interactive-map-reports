@@ -291,15 +291,47 @@ function generateVis(canvas, config){
       key.append("text")
       .attr("class", "legend-text")
         .attr("x",width/2 - getTextWidth(maxVal, 10,  " Segoe UI"))
-        .attr("y",height-52)
+        .attr("y",height-52) 
         .text(maxVal);
 
+      
+      //small circle  
       key.append("circle")
         .attr("class", "dots")
         .attr("fill", dotColor)
-        .attr("cx",width/2 + 30 +10 )
+        .attr("cx",width/2 + 30 + 5)
         .attr("cy",height-48)
-        .attr("r",10)
+        .attr("r",Math.sqrt(area(d3.min(dataArray2))*2/Math.PI));
+     
+      //middle circle
+      key.append("circle")
+        .attr("class", "dots")
+        .attr("fill", dotColor)
+        .attr("cx",width/2 + 30 + 30)
+        .attr("cy",height-48)
+        .attr("r",0.5*Math.sqrt(area(d3.max(dataArray2))*2/Math.PI));
+
+      //big circle
+      key.append("circle")
+        .attr("class", "dots")
+        .attr("fill", dotColor)
+        .attr("cx", width/2 + 30 + 62)
+        .attr("cy",height-48)
+        .attr("r", Math.sqrt(area(d3.max(dataArray2))*2/Math.PI));
+        
+
+      key.append("text")
+        .attr("class", "legend-text")
+        .attr("x",width/2 + 30 + 5 + Math.sqrt(area(d3.min(dataArray2))) )
+        .attr("y",height-52)
+        .text(d3.min(dataArray2));
+
+      key.append("text")
+        .attr("class", "legend-text")
+        .attr("x",width/2 + 30 + 60 +  Math.sqrt(area(d3.max(dataArray2))) )
+        .attr("y",height-52)
+        .text(d3.max(dataArray2));
+
 
       key.append("text")
         .attr("class", "legend-text")
