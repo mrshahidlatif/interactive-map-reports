@@ -208,16 +208,17 @@ function generateVis(canvas, config){
         .append("circle")
         .attr("class","dots")
         .attr("r", function (d){
+          if (d.properties.value2 == undefined) return ; 
           return Math.sqrt(area(d.properties.value2)*2/Math.PI)
         })
         .attr("fill",dotColor)
         .attr("transform",function(d){
+          if (d.properties.value2 == undefined) return ; 
           var p = path.centroid(d); //<-- centroid is the center of the path, projection maps it to pixel positions
           // console.log(p);
           return "translate("+p+")";
         })
         .on("mouseover", function(d) {
-
           div.transition().duration(300)
           .style("opacity", 1)
           div.html(d.properties.name + "<br/>" + d.properties.value + " " + config.indVariable + " <br/> "+ d.properties.value2 + " "+ config.depVariable)
@@ -319,7 +320,6 @@ function generateVis(canvas, config){
         .attr("cy",height-48)
         .attr("r", Math.sqrt(area(d3.max(dataArray2))*2/Math.PI));
         
-
       key.append("text")
         .attr("class", "legend-text")
         .attr("x",width/2 + 30 + 5 + Math.sqrt(area(d3.min(dataArray2))) )
