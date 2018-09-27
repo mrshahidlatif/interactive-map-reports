@@ -170,7 +170,7 @@ function generateNarrative(data,config){
 	var rText=""; 
 	if(config.causality=="yes"){ //Only print if there is causality in the variables
 		corr = computeCorrelation(allData);
-		// console.log(corr); 
+		console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
 			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
 			rText += "&mdash;higher the " + vIndDescriptor + config.indVariable + "," ;
@@ -476,26 +476,26 @@ function compareTwoRegions(a,b,ramp){
 
 	if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + a + '</span>'; 
-		comText += " has higher " + config.depVariable + " ("+aObj[config.depVariable]+") ";
+		comText +=  getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+") ";
 		comText += " and higher "+ config.indVariable + " ("+aObj[config.indVariable]+") ";
 		is_a_mentionded= true; 
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + b + '</span>'; 
-		comText += " has higher " + config.depVariable + " (" + bObj[config.depVariable] + ") ";
+		comText += getVerb("s","past",depVerb) + " higher "+ vDepDescriptor + config.depVariable + " (" + bObj[config.depVariable] + ") ";
 		comText += " and higher "+ config.indVariable + " ("+bObj[config.indVariable]+") "; 
 		is_b_mentionded = true;
 	}
 	else if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + a + '</span>'; 
-		comText += " has higher " + config.depVariable + " ("+aObj[config.depVariable]+") ";
-		comText += " but lower "+ config.indVariable + " ("+aObj[config.indVariable]+") "; 
+		comText += getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+") ";
+		comText += " but lower " + vIndDescriptor + config.indVariable + " ("+aObj[config.indVariable]+") "; 
 		is_a_mentionded= true;
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + b + '</span>'; 
-		comText += " has higher " + config.depVariable + " ("+bObj[config.depVariable]+") ";
-		comText += " but lower "+ config.indVariable + " ("+bObj[config.indVariable]+") ";
+		comText += getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+bObj[config.depVariable]+") ";
+		comText += " but lower " + vIndDescriptor + config.indVariable + " ("+bObj[config.indVariable]+") ";
 		is_b_mentionded = true; 
 	}
 	if (is_a_mentionded){
@@ -718,7 +718,7 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 		if (objs.length >2)
 			corr_arr[i] = ss.sampleCorrelation(ListOfObjToArray(objs,config.depVariable), ListOfObjToArray(objs,config.indVariable));
 	}
-	// console.log(corr_arr);
+	console.log(corr_arr);
 
 	var pos_corr_arr = []; 
 	var neg_corr_arr = [];

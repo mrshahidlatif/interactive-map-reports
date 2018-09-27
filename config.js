@@ -127,9 +127,41 @@ var e8_config = {
 	"unit": "number",
 	"situation": "negative",
 	"typeDepVariable": "quantitative",
-	"typeIndVariable": "quantitative",
+	"typeIndVariable": "casualties",
 	"year":"2005",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/cancer-alcohol-deaths.csv",
+	"causality": "yes"
+}
+
+var e9_config = {
+	"title": "Litracy rate and Govt. expenditure on health (% of GDP), 2010",
+	"geoRegion": "the World",
+	"granularity":"country",
+	"regionID" : "country",
+	"indVariable": "expenditure on education",
+	"depVariable": "literacy rate",
+	"situation": "positive",
+	"typeDepVariable": "demographic-indicator",
+	"typeIndVariable": "quantitative",
+	"year":"2010",
+	"geoJSONFile":"geography/world.json",
+	"dataFile":"data/literacy-rate-expenditure-on-education.csv",
+	"causality": "yes"
+}
+
+var e10_config = {
+	"title": "Obesity and consumption of alcohol (per capita, pure in litres), 2010",
+	"geoRegion": "the World",
+	"granularity":"country",
+	"regionID" : "country",
+	"indVariable": "alcohol consumption",
+	"depVariable": "obese people",
+	"situation": "negative",
+	"typeDepVariable": "quantitative",
+	"typeIndVariable": "quantitative",
+	"year":"2010",
+	"geoJSONFile":"geography/world.json",
+	"dataFile":"data/alcohol-obesity.csv",
 	"causality": "yes"
 }

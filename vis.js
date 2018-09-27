@@ -42,7 +42,7 @@ function generateVis(canvas, config){
   var dataFile = config.dataFile;  
 
   
-  var margin = {top: 0, right: 10, bottom: 30, left: 10};
+  var margin = {top: 0, right: 0, bottom: 20, left: 0};
   width = 600 -margin.left-margin.right;
   height = 500-margin.top - margin.bottom;
   
@@ -128,7 +128,9 @@ function generateVis(canvas, config){
       }
       var div = d3.select("body").append("div")   
                   .attr("class", "tooltip")               
-                  .style("opacity", 0);
+                  .style("opacity", 0)
+                  .style("border", "solid")
+                  .style("border-width","1px");
 
       // Bind the data to the SVG and create one path per GeoJSON feature
       svg.selectAll("path")
@@ -148,11 +150,22 @@ function generateVis(canvas, config){
          //Adding mouseevents
         .on("mouseover", function(d) {
           // d3.select(this).transition().duration(300).style("opacity", 1);
-          div.transition().duration(300)
-          .style("opacity", 1)
-          div.text(d.properties.name + " : " + d.properties.value + " " + config.indVariable + ", "+ d.properties.value2 + " "+ config.depVariable)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY -30) + "px");
+          if (d.properties.value == undefined || d.properties.value2 == undefined)
+          {
+            div.transition().duration(300)
+            .style("opacity", 1)
+            div.html(d.properties.name + " : No data available!")
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY -30) + "px");
+          } 
+          else {
+            div.transition().duration(300)
+            .style("opacity", 1)
+            div.html(d.properties.name + "<br/>" + d.properties.value + " " + config.indVariable + " <br/> "+ d.properties.value2 + " "+ config.depVariable)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY -30) + "px");
+           
+          }
         })
         .on("mouseout", function() {
           // d3.select(this)

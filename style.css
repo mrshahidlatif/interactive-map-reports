@@ -223,16 +223,16 @@ a:hover{
 
 div.tooltip {   
   position: absolute;           
-  text-align: center;           
-  width: 150px;                  
-  height: 35px;                 
+  text-align: left;
+  display: inline-block;          
+  /* width: 150px;                  
+  height: 35px;                  */
   padding: 2px;             
-  font-size: 10px;     
-  background: #dbdbdb;
-  border: 1px;      
-  border-radius: 8px;           
+  font-size: 12px;     
+  background: #fefff9;
+  border-color: #000;  
   pointer-events: none;  
-  z-index: 90      
+  z-index: 90;
 }
 .rID {
   font-weight: bold;
