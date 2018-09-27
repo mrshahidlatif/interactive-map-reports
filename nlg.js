@@ -383,7 +383,11 @@ function explainOnDemand(name,config,ramp){
 	
 	document.getElementById("eod-head").innerHTML = name.toProperCase();
 	var selectedRegion = allData.filter(function(d){return d[config.regionID].toLowerCase() == name.toLowerCase()});
-	
+	if (selectedRegion[0] == undefined) {
+		$("#eod").html("Data not available!");
+		return;
+	}
+
 	var value_dV = selectedRegion[0][config.depVariable];
 	var value_iV = selectedRegion[0][config.indVariable];
 	var avg_dV = getAverage(allData, config.depVariable);

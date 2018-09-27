@@ -286,13 +286,13 @@ function generateVis(canvas, config){
         .attr("class", "legend-text")
         .attr("x",width/2 - w)
         .attr("y",height-50)
-        .text(minVal);
+        .text(minVal.toLocaleString());
 
       key.append("text")
       .attr("class", "legend-text")
         .attr("x",width/2 - getTextWidth(maxVal, 10,  " Segoe UI"))
         .attr("y",height-52) 
-        .text(maxVal);
+        .text(maxVal.toLocaleString());
 
       
       //small circle  
@@ -324,13 +324,13 @@ function generateVis(canvas, config){
         .attr("class", "legend-text")
         .attr("x",width/2 + 30 + 5 + Math.sqrt(area(d3.min(dataArray2))) )
         .attr("y",height-52)
-        .text(d3.min(dataArray2));
+        .text(d3.min(dataArray2).toLocaleString());
 
       key.append("text")
         .attr("class", "legend-text")
         .attr("x",width/2 + 30 + 60 +  Math.sqrt(area(d3.max(dataArray2))) )
         .attr("y",height-52)
-        .text(d3.max(dataArray2));
+        .text(d3.max(dataArray2).toLocaleString());
 
 
       key.append("text")
