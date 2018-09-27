@@ -217,12 +217,19 @@ function generateVis(canvas, config){
           return "translate("+p+")";
         })
         .on("mouseover", function(d) {
-          d3.select(this).transition().duration(300).style("opacity", 1);
+
           div.transition().duration(300)
-          .style("opacity", 0.5)
-          div.text(d.properties.name + " : " + d.properties.value2 + " "+ config.depVariable)
+          .style("opacity", 1)
+          div.html(d.properties.name + "<br/>" + d.properties.value + " " + config.indVariable + " <br/> "+ d.properties.value2 + " "+ config.depVariable)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY -30) + "px");
+
+          // d3.select(this).transition().duration(300).style("opacity", 1);
+          // div.transition().duration(300)
+          // .style("opacity", 1)
+          // div.text(d.properties.name + " : " + d.properties.value2 + " "+ config.depVariable)
+          // .style("left", (d3.event.pageX) + "px")
+          // .style("top", (d3.event.pageY -30) + "px");
         })
         .on("mouseout", function() {
           d3.select(this)
