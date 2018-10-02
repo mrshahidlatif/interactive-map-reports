@@ -4,6 +4,7 @@ var vDepDescriptor="";
 var vIndDescriptor="";
 var verb = "";
 var corr = 0; 
+var infoDifferentFromNeighboringRegions; 
 //------------------------------
 //Thresold parameters 
 //------------------------------
@@ -21,6 +22,9 @@ function generateNarrative(data,config){
 
 	// console.log(ramp(200));
 	// console.log(dotColor);
+	
+	//Additional descriptions for the info icons 
+	infoDifferentFromNeighboringRegions = "The identification of such " + config.granularity.getPlural() + " depends on the fact that they are outliers among their neighbors."
 	
 	//Adding title to the report
 	// document.getElementById("reportTitle").innerHTML = config.depVariable.toProperCase() + " and " + config.indVariable + ", "+ config.geoRegion + " ("+ config.year+")"; 
@@ -222,13 +226,15 @@ function describeOddRegions(l, u, ramp){
 			s += stringifyListOfObjectswithColorCoding(uObjects,ramp);
 				s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
 			if(config.typeDepVariable == "casualties"){
-				s += " suffered a lot more casualties."; 
+				s += " suffered a lot more casualties ";
+				s += '<span title="'+ infoDifferentFromNeighboringRegions +'" class="moreInfoIcon">&#x1F6C8;</span>' + "."; 
 			}
 		}
 		if (l.length > 0){
 			s += "The "+ config.granularity + " " + stringifyListOfObjectswithColorCoding(lObjects,ramp);
 			if(config.typeDepVariable == "casualties"){
-				s += " suffered a lot less casualties."; 
+				s += " suffered a lot less casualties "; 
+				s += '<span title="'+ infoDifferentFromNeighboringRegions +'" class="moreInfoIcon">&#x1F6C8;</span>' + "."; 
 			}
 		}
 	}
@@ -397,7 +403,7 @@ function explainOnDemand(name,config,ramp){
 	// console.log(value_iV); 
 
 	//Based on dependant variable
-	exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + name.toProperCase()+ '</span>'; 
+	exp += name.toProperCase() ; 
 	exp += getVerb("s","past",depVerb) ;
 
 
@@ -419,19 +425,25 @@ function explainOnDemand(name,config,ramp){
 	//Based on independant variable
 	if(value_iV == getMin(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + " (" + value_iV+") ";
+		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + " (" ;
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
 		exp += config.indVariable; 
 	}
 	else if(value_iV == getMax(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + "(" + value_iV+") ";
+		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + "(" ;
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
 		exp += config.indVariable; 
 	}
 	else if(value_iV > avg_iV){
-		exp += " and above average (" + value_iV + ") "+ config.indVariable;
+		exp += " and above average (";
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
+		exp += config.indVariable;
 	}
 	else if (value_iV < avg_iV){
-		exp += " and below average (" + value_iV + ") " + config.indVariable;
+		exp += " and below average (" ;
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
+		exp += config.indVariable;
 	}
 
 	exp += " when compared to the other " + config.granularity.getPlural() + "."; 
@@ -452,14 +464,14 @@ function explainOnDemand(name,config,ramp){
 			var objs = getObjectsByNames(allData, neighbors); 
 
 			exp += " Compared to its neighbors, ";
-			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
+			exp += stringifyListOfObjects(objs, ramp);
 			exp +=  ", " + name.toProperCase();
 			exp += getVerb("s","past", depVerb) + " more " + config.depVariable + ".";
 		}
 		else if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="lower"){
 			var objs = getObjectsByNames(allData, neighbors); 
 			exp += " Compared to its neighbors, ";
-			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
+			exp += stringifyListOfObjects(objs, ramp);
 			exp += ", " + name.toProperCase();
 			exp += getVerb("s","past", depVerb) ;
 			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
