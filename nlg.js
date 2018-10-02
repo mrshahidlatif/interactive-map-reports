@@ -15,7 +15,9 @@ function generateNarrative(data,config){
 
 	var minVal = getMin(allData, config.indVariable);
 	var maxVal = getMax(allData, config.indVariable);
-	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor]);
+	// var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor]);
+	// Deactivating the coloring for state names 
+	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range(['#ffffff','#ffffff']);
 
 	// console.log(ramp(200));
 	// console.log(dotColor);

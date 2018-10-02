@@ -39,7 +39,6 @@ var e3_config = {
 	"regionID" : "id",
 	"indVariable": "pedestrian-fatalities",
 	"depVariable": "bicyclist-fatalities",
-	"unit": "number",
 	"situation": "negative",
 	"typeDepVariable": "casualties",
 	"typeIndVariable": "casualties",
