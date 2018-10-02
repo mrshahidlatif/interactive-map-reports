@@ -245,10 +245,10 @@ function stringifyListOfObjectswithColorCoding(list,ramp){
 	for (var i=0;i<list.length;i++){
 		if (i==list.length-1){
 			// s += "and "+list[i][config.regionID];
-			s += " and " + '<span class="rID" style="background-color:'+ramp(list[i][config.indVariable])+'">' + list[i][config.regionID].toProperCase()+ '</span>' ;
+			s += " and " + '<span class="rID">' + list[i][config.regionID].toProperCase()+ '</span>' ;
 		}
 		else {
-			s+= '<span class="rID" style="background-color:'+ramp(list[i][config.indVariable])+'">' + list[i][config.regionID].toProperCase()+ '</span>'+ ", ";
+			s+= '<span class="rID">' + list[i][config.regionID].toProperCase()+ '</span>'+ ", ";
 		}
 	}
 	return s; 
@@ -464,14 +464,14 @@ function explainOnDemand(name,config,ramp){
 			var objs = getObjectsByNames(allData, neighbors); 
 
 			exp += " Compared to its neighbors, ";
-			exp += stringifyListOfObjects(objs, ramp);
+			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
 			exp +=  ", " + name.toProperCase();
 			exp += getVerb("s","past", depVerb) + " more " + config.depVariable + ".";
 		}
 		else if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="lower"){
 			var objs = getObjectsByNames(allData, neighbors); 
 			exp += " Compared to its neighbors, ";
-			exp += stringifyListOfObjects(objs, ramp);
+			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
 			exp += ", " + name.toProperCase();
 			exp += getVerb("s","past", depVerb) ;
 			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
