@@ -221,19 +221,22 @@ function describeOddRegions(l, u, ramp){
 
 	var s="";
 	if (l.length>0 || u.length >0){
-		s += " The " + config.granularity+ " " ;
+		s += " The ";
 		if (u.length > 0){
+			s +=  (u.length == 1) ? config.granularity + " ": config.granularity.getPlural() + " " ;
 			s += stringifyListOfObjectswithColorCoding(uObjects,ramp);
-				s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
+			s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
 			if(config.typeDepVariable == "casualties"){
 				s += " suffered a lot more casualties ";
 				s += '<span title="'+ infoDifferentFromNeighboringRegions +'" class="moreInfoIcon">&#x1F6C8;</span>' + "."; 
 			}
 		}
 		if (l.length > 0){
-			s += "The "+ config.granularity + " " + stringifyListOfObjectswithColorCoding(lObjects,ramp);
+			s +=  (l.length == 1) ? config.granularity + " ": config.granularity.getPlural() + " " ;
+			s += stringifyListOfObjectswithColorCoding(lObjects,ramp);
+			s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
 			if(config.typeDepVariable == "casualties"){
-				s += " suffered a lot less casualties "; 
+				s += " suffered a lot more casualties ";
 				s += '<span title="'+ infoDifferentFromNeighboringRegions +'" class="moreInfoIcon">&#x1F6C8;</span>' + "."; 
 			}
 		}
@@ -408,42 +411,36 @@ function explainOnDemand(name,config,ramp){
 
 
 	if(value_dV == getMin(allData,config.depVariable)) {
-		exp += (value_dV==0) ? "no " : "the lowest" + vDepDescriptor + " (" + value_dV+") ";
-		exp += config.depVariable; 
+		exp += (value_dV==0) ? "no " : "the lowest" + vDepDescriptor + config.depVariable + " (" + value_dV+") ";
 	}
 	else if(value_dV == getMax(allData,config.depVariable)) {
-		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor + " (" + value_dV+") ";
-		exp += config.depVariable; 
+		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor +config.depVariable+ " (" + value_dV+") ";
 	}
 	else if(value_dV > avg_dV){
-		exp += " above average (" + value_dV + ") "+ config.depVariable;
+		exp += " above average"  + vDepDescriptor +  config.depVariable+ " (" + value_dV + ") ";
 	}
 	else if (value_dV < avg_dV){
-		exp += " below average (" + value_dV + ") " + config.depVariable;
+		exp += " below average"  + vDepDescriptor +  config.depVariable+ " (" + value_dV + ") ";
 	}
-
 	//Based on independant variable
 	if(value_iV == getMin(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + " (" ;
-		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
-		exp += config.indVariable; 
+		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + config.indVariable + " (" + '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
 	}
 	else if(value_iV == getMax(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + "(" ;
-		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
-		exp += config.indVariable; 
+		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + config.indVariable + "(" + '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		
 	}
 	else if(value_iV > avg_iV){
-		exp += " and above average (";
-		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
-		exp += config.indVariable;
+		exp += " and above average"+ vIndDescriptor+ config.indVariable + " (";
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		// exp += config.indVariable;
 	}
 	else if (value_iV < avg_iV){
-		exp += " and below average (" ;
-		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV + '</span>' +") ";
-		exp += config.indVariable;
+		exp += " and below average"+ vIndDescriptor+ config.indVariable + " (";
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		// exp += config.indVariable;
 	}
 
 	exp += " when compared to the other " + config.granularity.getPlural() + "."; 
@@ -478,8 +475,8 @@ function explainOnDemand(name,config,ramp){
 			exp += config.depVariable + ".";
 		}
 	}
-
-	document.getElementById("eod").innerHTML = exp;
+	$("#eod").html(exp);
+	// document.getElementById("eod").innerHTML = exp;
 }
 function compareTwoRegions(a,b,ramp){
 	var comText = "";
