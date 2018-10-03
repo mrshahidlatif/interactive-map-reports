@@ -60,6 +60,10 @@ function generateNarrative(data,config){
 		vIndDescriptor = " values of ";
 		indVerb = " " + verb_monetary[Math.floor(Math.random()*verb_monetary.length)] + " ";
 	}
+	else if (config.typeIndVariable == "uncountable") {
+		vIndDescriptor = " ";
+		indVerb = " " + verb_monetary[Math.floor(Math.random()*verb_monetary.length)] + " ";
+	}
 
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 

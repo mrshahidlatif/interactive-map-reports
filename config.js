@@ -89,7 +89,8 @@ var e6_config = {
 	"regionID" : "country",
 	"indVariable": "internet-users",
 	"depVariable": "adolescent-birth-rates",
-	"unit": "number",
+	"unitDepVariable": "per 1,000 women",
+	"unitIndVariable": "percentage of total population",
 	"situation": "neutral",
 	"typeDepVariable": "demographic-indicator",
 	"typeIndVariable": "quantitative",
@@ -100,13 +101,14 @@ var e6_config = {
 }
 
 var e7_config = {
-	"title": "Obesity (>20 years old, %) and internet users (%) among countries of the world",
+	"title": "Obesity  and internet users among countries of the world",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
 	"indVariable": "internet-users",
 	"depVariable": "obese-people",
-	"unit": "number",
+	"unitDepVariable": "(>20 years old, %)",
+	"unitIndVariable": "percentage of total population",
 	"situation": "negative",
 	"typeDepVariable": "quantitative",
 	"typeIndVariable": "quantitative",
@@ -150,15 +152,17 @@ var e9_config = {
 }
 
 var e10_config = {
-	"title": "Obesity and consumption of alcohol (per capita, pure in litres), 2010",
+	"title": "Obesity and consumption of alcohol, 2010",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
 	"indVariable": "alcohol consumption",
 	"depVariable": "obese people",
+	"unitDepVariable": ">20 years old, percentage of total population",
+	"unitIndVariable": "per capita, pure in liters",
 	"situation": "negative",
 	"typeDepVariable": "quantitative",
-	"typeIndVariable": "quantitative",
+	"typeIndVariable": "uncountable",
 	"year":"2010",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/alcohol-obesity.csv",
