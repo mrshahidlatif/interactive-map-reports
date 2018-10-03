@@ -492,36 +492,48 @@ function compareTwoRegions(a,b,ramp){
 	if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID">' + a + '</span>'; 
 		comText +=  getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+") ";
-		comText += " and higher "+ config.indVariable + " ("+aObj[config.indVariable]+") ";
+		comText += " and higher "+ config.indVariable + " (";
+		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>'; 
+		comText += ") ";
 		is_a_mentionded= true; 
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID">' + b + '</span>'; 
 		comText += getVerb("s","past",depVerb) + " higher "+ vDepDescriptor + config.depVariable + " (" + bObj[config.depVariable] + ") ";
-		comText += " and higher "+ config.indVariable + " ("+bObj[config.indVariable]+") "; 
+		comText += " and higher "+ config.indVariable + " (";
+		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>'; 
+		comText += ") "; 
 		is_b_mentionded = true;
 	}
 	else if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID">' + a + '</span>'; 
 		comText += getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+") ";
-		comText += " but lower " + vIndDescriptor + config.indVariable + " ("+aObj[config.indVariable]+") "; 
+		comText += " but lower " + vIndDescriptor + config.indVariable + " (";
+		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>';
+		comText += ") "; 
 		is_a_mentionded= true;
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID">' + b + '</span>'; 
 		comText += getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+bObj[config.depVariable]+") ";
-		comText += " but lower " + vIndDescriptor + config.indVariable + " ("+bObj[config.indVariable]+") ";
+		comText += " but lower " + vIndDescriptor + config.indVariable + " (";
+		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>';
+		comText += ") ";
 		is_b_mentionded = true; 
 	}
 	if (is_a_mentionded){
 		comText += " when compared to "; 
 		comText += '<span class="rID">' + b + '</span>';
-		comText += " (" + bObj[config.depVariable]+ " "+ config.depVariable+ ", "+ bObj[config.indVariable] +" "+config.indVariable +")."
+		comText += " (" + bObj[config.depVariable]+ " "+ config.depVariable+ ", ";
+		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>';
+		comText += " "+config.indVariable +")."
 	}
 	else if (is_b_mentionded){
 		comText += " when compared to ";
 		comText += '<span class="rID">' + a + '</span>';
-		comText += " (" + aObj[config.depVariable]+ " "+ config.depVariable+ ", "+ aObj[config.indVariable] +" "+config.indVariable +")."
+		comText += " (" + aObj[config.depVariable]+ " "+ config.depVariable+ ", ";
+		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>';
+		comText += " "+config.indVariable +")."
 	}
 	document.getElementById("eod").innerHTML = comText; 
 	is_a_mentionded = false; 
