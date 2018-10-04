@@ -45,6 +45,11 @@ function generateNarrative(data,config){
 		vDepDescriptor = " number of ";
 		depVerb = " " + verb_quantitative[Math.floor(Math.random()*verb_quantitative.length)] + " "; 
 	}
+	else if (config.typeDepVariable == "uncountable"){
+		vDepDescriptor = " ";
+		depVerb = " " + verb_uncountable[Math.floor(Math.random()*verb_uncountable.length)] + " "; 
+	
+	}
 
 	//Description of independent variable according to their type 
 	if (config.typeIndVariable == "quantitative" ){
@@ -62,7 +67,7 @@ function generateNarrative(data,config){
 	}
 	else if (config.typeIndVariable == "uncountable") {
 		vIndDescriptor = " ";
-		indVerb = " " + verb_monetary[Math.floor(Math.random()*verb_monetary.length)] + " ";
+		indVerb = " " + verb_uncountable[Math.floor(Math.random()*verb_uncountable.length)] + " ";
 	}
 
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
@@ -277,7 +282,7 @@ function stringifyListOfObjects(list){
 function stringifyBivariateOutliers(list,ramp){
 	//list = list of bivariate outliers
 	var s = ""; 
-	// console.log(list[0]);
+	console.log(list);
 
 	var olDepV = getUpperUnivariateOutliers(allData, config.depVariable);
 	var olIndV = getUpperUnivariateOutliers(allData, config.indVariable);
@@ -303,6 +308,18 @@ function stringifyBivariateOutliers(list,ramp){
 		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.indVariable] + '</span>' + "), ";
 		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
 		s += " shows high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+").";
+	}
+
+	if(!isExist(olDepV, list[0][config.regionID]) && isExist(olIndV, list[0][config.regionID])){
+		s += " In comparison to the other " + config.granularity.getPlural() + ", ";
+		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
+		s += getVerb("s","past",depVerb) + " low " + vDepDescriptor + " " +config.depVariable + " despite high "+ vIndDescriptor + " "+ config.indVariable + "." ;
+	}
+	//is it even possible?
+	if(!isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
+		s += " In comparison to the other " + config.granularity.getPlural() + ", ";
+		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
+		s += getVerb("s","past",depVerb) + " low " + vDepDescriptor + " " +config.depVariable + " and low "+ vIndDescriptor + " "+ config.indVariable + "." ;
 	}
 	return s; 
 }
