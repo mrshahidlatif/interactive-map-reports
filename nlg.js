@@ -120,7 +120,7 @@ function generateNarrative(data,config){
 
 	//focusVText += (config.causality=="no") ? ", whereas " + vIndDescriptor + config.indVariable +" ranges between " + getMin(allData, config.indVariable) + " and " + getMax(allData, config.indVariable)+"." : ".";
 	
-	console.log(outliers_v2);
+	// console.log(outliers_v2);
 	if(outliers_v2.length>0){  
 		outliers_v2 = outliers_v2.filter(function(d){return d[config.regionID] != maxRegion[config.regionID];});
 		if (outliers_v2.length>0) focusVText += stringifyList_v2(outliers_v2,ramp);
@@ -180,7 +180,7 @@ function generateNarrative(data,config){
 	var rText=""; 
 	if(config.causality=="yes"){ //Only print if there is causality in the variables
 		corr = computeCorrelation(allData);
-		console.log(corr); 
+		// console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
 			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
 			rText += "&mdash;higher the " + vIndDescriptor + config.indVariable + "," ;
@@ -222,6 +222,7 @@ function describeOddRegions(l, u, ramp){
 	var lObjects = getObjectsByNames(allData,l);
 	var uObjects = getObjectsByNames(allData,u);
 	// console.log(uObjects);
+	// console.log(lObjects);
 
 	var s="";
 	if (l.length>0 || u.length >0){
@@ -276,7 +277,7 @@ function stringifyListOfObjects(list){
 function stringifyBivariateOutliers(list,ramp){
 	//list = list of bivariate outliers
 	var s = ""; 
-	console.log(list[0]);
+	// console.log(list[0]);
 
 	var olDepV = getUpperUnivariateOutliers(allData, config.depVariable);
 	var olIndV = getUpperUnivariateOutliers(allData, config.indVariable);
@@ -295,7 +296,7 @@ function stringifyBivariateOutliers(list,ramp){
 		list = list.filter(function(d){return d[config.regionID] != list[0][config.regionID];});
 	}
 
-	console.log(list);
+	// console.log(list);
 	//Case 2 - outlier in dependent variable but not in independent variable
 	if(isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
 		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" + list[0][config.indVariable]+"), ";
@@ -339,7 +340,7 @@ function stringifyList_v2(list,ramp){
 	//TESTED
 	var string="";
 	// moreRegionsString = stringifyListOfObjects(list);
-	console.log(list); 
+	// console.log(list); 
 	list = getTopNItems(list, 3, 4, config.depVariable);
 
 	switch (list.length) {
@@ -421,10 +422,10 @@ function explainOnDemand(name,config,ramp){
 		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor +config.depVariable+ " (" + value_dV+") ";
 	}
 	else if(value_dV > avg_dV){
-		exp += " above average"  + vDepDescriptor +  config.depVariable+ " (" + value_dV + ") ";
+		exp += " above average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + ") ";
 	}
 	else if (value_dV < avg_dV){
-		exp += " below average"  + vDepDescriptor +  config.depVariable+ " (" + value_dV + ") ";
+		exp += " below average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + ") ";
 	}
 	//Based on independant variable
 	if(value_iV == getMin(allData,config.indVariable)) {
@@ -437,12 +438,12 @@ function explainOnDemand(name,config,ramp){
 		
 	}
 	else if(value_iV > avg_iV){
-		exp += " and above average"+ vIndDescriptor+ config.indVariable + " (";
+		exp += " and above average "+ vIndDescriptor+ config.indVariable + " (";
 		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
 		// exp += config.indVariable;
 	}
 	else if (value_iV < avg_iV){
-		exp += " and below average"+ vIndDescriptor+ config.indVariable + " (";
+		exp += " and below average "+ vIndDescriptor+ config.indVariable + " (";
 		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
 		// exp += config.indVariable;
 	}
@@ -457,6 +458,7 @@ function explainOnDemand(name,config,ramp){
 		var neighbors = geo_neighbors[name.toProperCase()].split(",");
 		// console.log(neighbors);
 		var neighbor_objects = getObjectsByNames(allData, neighbors);
+		// console.log(neighbor_objects);
 		var arrOfNeighborValues = ListOfObjToArray(neighbor_objects, [config.depVariable]);
 
 		// console.log(arrOfNeighborValues); 
@@ -565,6 +567,7 @@ function ListOfObjToArray(list, column){
 function isOutlierAmongNeighbors(neighbors, p){
 
 	neighbors.push(+p);
+	// console.log(p);
 	// console.log(neighbors);
 	var firstQ = ss.quantile(neighbors, 0.25);
 	var thirdQ = ss.quantile(neighbors, 0.75);
@@ -708,7 +711,7 @@ function analyse(data, config){
 		arr2D[i][0] = +data[i][config.indVariable];
 		arr2D[i][1] = +data[i][config.depVariable];
 	}
-	console.log(arr2D);
+	// console.log(arr2D);
 	var mDistances = mahalanobis(arr2D);
 	// console.log(mDistances);
 	for (var i=0;i<mDistances.length;i++){
@@ -749,7 +752,7 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 		if (objs.length >2)
 			corr_arr[i] = ss.sampleCorrelation(ListOfObjToArray(objs,config.depVariable), ListOfObjToArray(objs,config.indVariable));
 	}
-	console.log(corr_arr);
+	// console.log(corr_arr);
 
 	var pos_corr_arr = []; 
 	var neg_corr_arr = [];
