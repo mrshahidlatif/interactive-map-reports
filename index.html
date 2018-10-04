@@ -81,8 +81,6 @@
     }
     $(document).ready(function(){
         console.log("iMR loaded!");
-
-
       //URL PARAMETERS 
       function getParameterByName(id, url) {
         if (!url) url = window.location.href;
@@ -183,6 +181,10 @@
       generateVis("map", config);
       var facts = analyse(data, config);
       generateNarrative(facts, config);
+      var mindepVal = getMin(d, config.depVariable);
+      var maxdepVal = getMax(d, config.depVariable);
+      var area = d3.scaleLinear().domain([mindepVal,maxdepVal]).range([1,225]);
+      makeInlineDots(area);
     });
     // });
     closeNav();
