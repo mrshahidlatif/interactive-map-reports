@@ -81,6 +81,22 @@
     }
     $(document).ready(function(){
         console.log("iMR loaded!");
+
+
+      //URL PARAMETERS 
+      function getParameterByName(id, url) {
+        if (!url) url = window.location.href;
+        id = id.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + id + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+          return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        var id_param = getParameterByName('id');
+        // console.log(id_param);
+
+        if(id_param != null) {loadExample(id_param);}
         
         var config="";
         var regions="";
@@ -102,7 +118,6 @@
   function loadExample(id){
     var data=[];
     // d3.json("config.json", function(d){
-    // console.log(id)
     
     //removing contents before loading next example
     $('p').empty();
