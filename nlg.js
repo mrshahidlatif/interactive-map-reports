@@ -16,9 +16,9 @@ function generateNarrative(data,config){
 
 	var minVal = getMin(allData, config.indVariable);
 	var maxVal = getMax(allData, config.indVariable);
-	// var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor]);
+	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor]);
 	// Deactivating the coloring for state names 
-	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range(['#ffffff','#ffffff']);
+	// var ramp = d3.scaleLinear().domain([minVal,maxVal]).range(['#ffffff','#ffffff']);
 
 	// console.log(ramp(200));
 	// console.log(dotColor);
@@ -112,9 +112,9 @@ function generateNarrative(data,config){
 	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + ", and it "; 
 	focusVText += " varies from ";
 	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString();
-	focusVText += " in " + '<span class="rID" style="background-color:'+ramp(getMin(allData, config.depVariable))+'">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
+	focusVText += " in " + '<span class="rID">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
 	focusVText += (regionsWithMinValues.length > 1) ? '<span title="'+ moreRegionsWithMinValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
-	focusVText += " to " + getMax(allData, config.depVariable).toLocaleString() + " in " + '<span class="rID" style="background-color:'+ramp(getMax(allData, config.indVariable))+'">'+ maxRegion[config.regionID].toProperCase() + '</span>';
+	focusVText += " to " + getMax(allData, config.depVariable).toLocaleString() + " in " + '<span class="rID">'+ maxRegion[config.regionID].toProperCase() + '</span>';
 	focusVText += (regionsWithMaxValues.length > 1) ? '<span title="'+ moreRegionsWithMaxValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
 	focusVText += " across " + config.geoRegion +".";
 
@@ -288,7 +288,7 @@ function stringifyBivariateOutliers(list,ramp){
 	//Case 1 - upper outlier in both variables
 	if(isExist(olDepV, list[0][config.regionID]) && isExist(olIndV, list[0][config.regionID])){
 		s += " In comparison to the other " + config.granularity.getPlural() + ", ";
-		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
+		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
 		s += getVerb("s","past",depVerb) + " high " + vDepDescriptor + " " +config.depVariable + " as well as high "+ vIndDescriptor + " "+ config.indVariable + "." ;
 	}
 	//removing the outlier that was stated - only remove if there are more that 2 bivariate outliers
@@ -299,8 +299,9 @@ function stringifyBivariateOutliers(list,ramp){
 	// console.log(list);
 	//Case 2 - outlier in dependent variable but not in independent variable
 	if(isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
-		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" + list[0][config.indVariable]+"), ";
-		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
+		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" ;
+		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.indVariable] + '</span>' + "), ";
+		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
 		s += " shows high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+").";
 	}
 	return s; 
@@ -346,21 +347,21 @@ function stringifyList_v2(list,ramp){
 	switch (list.length) {
 		case 1:  
 			string += " Other "+ config.granularity + " showing high ";
-			string += vDepDescriptor + " " + config.depVariable + " is " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable].toLocaleString() + ")" ;
-			string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable].toLocaleString() + " " + config.indVariable+"." : ".";
+			string += vDepDescriptor + " " + config.depVariable + " is " + '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' +" (" +list[0][config.depVariable].toLocaleString() + ")." ;
+			// string += (config.causality == "yes") ? " as a result of "+ list[0][config.indVariable].toLocaleString() + " " + config.indVariable+"." : ".";
 			break;
 		case 2:
 			string += " Other "+ config.granularity.getPlural() + " showing high ";
-			string += vDepDescriptor + " " + config.depVariable + " are " + '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.regionID].toProperCase()+ '</span>' + " (" + list[0][config.depVariable].toLocaleString() + ")" + " and "+ '<span class="rID" style="background-color:'+ramp(list[1][config.indVariable])+'">' + list[1][config.regionID].toProperCase()+ '</span>' + " (" + list[1][config.depVariable] + ").";
+			string += vDepDescriptor + " " + config.depVariable + " are " + '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' + " (" + list[0][config.depVariable].toLocaleString() + ")" + " and "+ '<span class="rID" style="background-color:'+ramp(list[1][config.indVariable])+'">' + list[1][config.regionID].toProperCase()+ '</span>' + " (" + list[1][config.depVariable] + ").";
 			break;
 		default:
 			string += " Other "+ config.granularity.getPlural() + " showing high ";
 			string += vDepDescriptor + config.depVariable + " are "; 
 			for(i=0;i<list.length;i++){
 				if(i < list.length -1)
-					string += '<span class="rID" style="background-color:'+ramp(list[i][config.indVariable])+'">' + list[i][config.regionID].toProperCase()+ '</span>' + " (" +list[i][config.depVariable]+ ")" + ", ";
+					string += '<span class="rID">' + list[i][config.regionID].toProperCase()+ '</span>' + " (" +list[i][config.depVariable]+ ")" + ", ";
 				else 
-					string += " and " + '<span class="rID" style="background-color:'+ramp(list[i][config.indVariable])+'">' + list[i][config.regionID].toProperCase()+ '</span>' + " (" +list[i][config.depVariable]+ ")"+ ". ";
+					string += " and " + '<span class="rID">' + list[i][config.regionID].toProperCase()+ '</span>' + " (" +list[i][config.depVariable]+ ")"+ ". ";
 			}
 			// string += '<span title="'+ moreRegionsString +'" class="moreInfoIcon">&#x1F6C8;</span>'; 
 			break;
