@@ -378,7 +378,9 @@ function stringifyList_v2(list,ramp,area){
 	//TESTED
 	var string="";
 	// moreRegionsString = stringifyListOfObjects(list);
-	// console.log(list); 
+	// console.log(list);
+	var completeList = list;
+	console.log(completeList); 
 	list = getTopNItems(list, 3, 4, config.depVariable);
 
 	switch (list.length) {
@@ -404,17 +406,34 @@ function stringifyList_v2(list,ramp,area){
 					inlineDots.push({id:sid, val:+list[i][config.depVariable]});
 				}
 				else {
-					string += " and " + '<span class="rID">' + list[i][config.regionID].toProperCase()+ '</span>' + " (" +list[i][config.depVariable]+  '<svg width="'+ W +'"height="'+ H + '" id=uol'+i+'></svg>' + ")"+ ". ";
+					string += " and " + '<span class="rID">' + list[i][config.regionID].toProperCase()+ '</span>' + " (" +list[i][config.depVariable]+  '<svg width="'+ W +'"height="'+ H + '" id=uol'+i+'></svg>' + ")";
 					var sid="uol"+i;
 					inlineDots.push({id:sid, val:+list[i][config.depVariable]});
 				}
 
 			}
+			if (completeList.length>list.length){
+				string += '<span title="'+ stringifyListOfObjectsWithValues(completeList) +'" class="moreInfoIcon">&#x1F6C8;</span>';
+			}
 			// string += '<span title="'+ moreRegionsString +'" class="moreInfoIcon">&#x1F6C8;</span>'; 
+			string += "."
 			break;
 	}
 	return string;
 }
+function stringifyListOfObjectsWithValues(list){
+	var s = "";
+	for (var i=0;i<list.length;i++){
+		if (i==list.length-1){
+			s+= "and "+list[i][config.regionID] + " ("+list[i][config.depVariable]+ ")";
+		}
+		else {
+			s+= list[i][config.regionID]+ " ("+list[i][config.depVariable]+ "), ";
+		}
+	}
+	return s; 
+}
+
 function stringifyList_v1(list){
 	list.sort(function(a,b){return +b[config.indVariable]- +a[config.indVariable];});
 	// console.log(list)
