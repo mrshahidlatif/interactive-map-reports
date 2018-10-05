@@ -1047,6 +1047,7 @@ function makeInlineDot(canvas,h,w){
 function makeInlineDots(scale){
 	w=30;
 	h=30;
+	
 	for (var i=0;i<inlineDots.length;i++){
 		var key = d3.select("#" + inlineDots[i].id)
 		.append('g')
@@ -1059,7 +1060,7 @@ function makeInlineDots(scale){
 			.attr("fill", dotColor)
 			.attr("cx",w/2 )
 			.attr("cy",h/2)
-			.attr("r",Math.sqrt(scale(inlineDots[i].val))*2/Math.PI);
+			.attr("r",Math.sqrt(scale(inlineDots[i].val)*2/Math.PI));
 	}
 }
 function makeInlineDotsEOD(){
@@ -1080,6 +1081,6 @@ function makeInlineDotsEOD(){
 			.attr("fill", dotColor)
 			.attr("cx",w/2 )
 			.attr("cy",h/2)
-			.attr("r",Math.sqrt(scale(inlineDotsEOD[i].val))*2/Math.PI);
+			.attr("r",Math.sqrt(scale(inlineDotsEOD[i].val)*2/Math.PI));
 	}
 }

@@ -19,19 +19,19 @@ function generateVis(canvas, config){
   //Color Scheme
   switch (config.situation) {
     case "positive":
-         dotColor = '#2a4fc9'
-        lowColor = '#afdbc4'
-        highColor = '#047c3e'
+        dotColor = '#008000'
+        lowColor = '#f0f0f0'
+        highColor = '#636363'
         break;
     case "negative":
-         dotColor = '#000000'
-         lowColor = '#ffb7b7'
-         highColor = '#ff0000'
+         dotColor = '#ff0000'
+         lowColor = '#f0f0f0'
+         highColor = '#636363'
         break;
     case "neutral":
          dotColor = '#FF8000'
-         lowColor = '#deebf7'
-         highColor = '#3182bd'
+         lowColor = '#f0f0f0'
+         highColor = '#636363'
         break;
     default:
       // statements_def
@@ -51,12 +51,12 @@ function generateVis(canvas, config){
   var projection = d3.geoAlbersUsa()
   // var projection = d3.geoEquirectangular()
     .translate([width / 2, height / 2]) // translate to center of screen
-    .scale(700); // scale things down so see entire US
+    .scale(800); // scale things down so see entire US
   }
   else if (config.geoRegion == "the World"){
     var projection = d3.geoMercator()
-    .scale(width*0.3)
-    .translate([width/2, height/2])
+    .scale(width*0.20)
+    .translate([width/2, height/2+48])
   }
   else{
     var projection = d3.geoStereographic()
@@ -145,7 +145,7 @@ function generateVis(canvas, config){
         .style("fill", function(d) { 
           if (d.properties.value != undefined)
             return ramp(d.properties.value);
-          else return "#bdbdbd";
+          else return "#ffffff";
         })
          //Adding mouseevents
         .on("mouseover", function(d) {
