@@ -1,5 +1,5 @@
 var e1_config = {
-	"title": "Fatalities caused by storms in the USA, 2017",
+	"title": "Fatalities caused by storms, USA, 2017",
 	"geoRegion": "the United States of America",
 	"granularity":"state",
 	"regionID" : "id",
@@ -15,12 +15,12 @@ var e1_config = {
 }
 
 var e2_config = {
-	"title": "Average life expectancy and spendings on health across Europe, 2018",
+	"title": "Average life expectancy and spendings on health, Europe, 2018",
 	"geoRegion": "Europe",
 	"granularity":"country",
 	"regionID" : "id",
-	"indVariable": "health_expenditure",
-	"depVariable": "life_expectancy",
+	"indVariable": "health expenditure",
+	"depVariable": "life expectancy",
 	"typeDepVariable": "demographic-indicator",
 	"typeIndVariable": "monetary",
 	"unitDepVariable": "years",
@@ -32,23 +32,23 @@ var e2_config = {
 	"causality": "yes"
 }
 
-var e3_config = {
-	"title": "Pedestrian and bicyclist deaths in the USA, 2008",
-	"geoRegion": "the United States of America",
-	"granularity":"state",
-	"regionID" : "id",
-	"indVariable": "pedestrian-fatalities",
-	"depVariable": "bicyclist-fatalities",
-	"situation": "negative",
-	"typeDepVariable": "casualties",
-	"typeIndVariable": "casualties",
-	"year":"2008",
-	"geoJSONFile":"us-states.json",
-	"dataFile":"data/traffic-accidents-usa.csv",
-	"causality": "no"
-}
+// var e8_config = {
+// 	"title": "Pedestrian and bicyclist deaths in the USA, 2008",
+// 	"geoRegion": "the United States of America",
+// 	"granularity":"state",
+// 	"regionID" : "id",
+// 	"indVariable": "pedestrian-fatalities",
+// 	"depVariable": "bicyclist-fatalities",
+// 	"situation": "negative",
+// 	"typeDepVariable": "casualties",
+// 	"typeIndVariable": "casualties",
+// 	"year":"2008",
+// 	"geoJSONFile":"us-states.json",
+// 	"dataFile":"data/traffic-accidents-usa.csv",
+// 	"causality": "no"
+// }
 
-var e4_config = {
+var e5_config = {
 	"title": "Storks deliver babies, Europe, 2000",
 	"geoRegion": "Europe",
 	"granularity":"country",
@@ -66,8 +66,8 @@ var e4_config = {
 	"causality":"yes"
 }
 
-var e5_config = {
-	"title": "Per capita income in the USA, 2015",
+var e7_config = {
+	"title": "Per capita income and population, USA, 2015",
 	"geoRegion": "the United States of America",
 	"granularity":"state",
 	"regionID" : "state",
@@ -82,13 +82,13 @@ var e5_config = {
 	"dataFile":"data/pop-pci-usa.csv",
 	"causality": "yes"
 }
-var e6_config = {
-	"title": "Adolescent birth-rates and use of internet among countries of the world",
+var e3_config = {
+	"title": "Adolescent birth rates and use of internet, World, 2015",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
-	"indVariable": "internet-users",
-	"depVariable": "adolescent-birth-rates",
+	"indVariable": "internet users",
+	"depVariable": "adolescent birth rates",
 	"unitDepVariable": "per 1,000 women",
 	"unitIndVariable": "percentage of total population",
 	"situation": "neutral",
@@ -100,31 +100,31 @@ var e6_config = {
 	"causality": "yes"
 }
 
-var e7_config = {
-	"title": "Obesity  and internet users among countries of the world",
-	"geoRegion": "the World",
-	"granularity":"country",
-	"regionID" : "country",
-	"indVariable": "internet-users",
-	"depVariable": "obese-people",
-	"unitDepVariable": ">20 years old, percentage",
-	"unitIndVariable": "percentage of total population",
-	"situation": "negative",
-	"typeDepVariable": "quantitative",
-	"typeIndVariable": "quantitative",
-	"year":"2015",
-	"geoJSONFile":"geography/world.json",
-	"dataFile":"data/internet-user-obesity.csv",
-	"causality": "yes"
-}
+// var e9_config = {
+// 	"title": "Obesity and internet users among countries of the world",
+// 	"geoRegion": "the World",
+// 	"granularity":"country",
+// 	"regionID" : "country",
+// 	"indVariable": "internet-users",
+// 	"depVariable": "obese-people",
+// 	"unitDepVariable": ">20 years old, percentage",
+// 	"unitIndVariable": "percentage of total population",
+// 	"situation": "negative",
+// 	"typeDepVariable": "quantitative",
+// 	"typeIndVariable": "quantitative",
+// 	"year":"2015",
+// 	"geoJSONFile":"geography/world.json",
+// 	"dataFile":"data/internet-user-obesity.csv",
+// 	"causality": "yes"
+// }
 
 var e8_config = {
-	"title": "Deaths due to cancer (per 100 000 population) and alcohol consumption, 2005",
+	"title": "Deaths due to cancer and consumption of alcohol, World, 2005",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
-	"indVariable": "alcohol-consumption",
-	"depVariable": "deaths-due-to-cancer",
+	"indVariable": "alcohol consumption",
+	"depVariable": "deaths due to cancer",
 	"unitDepVariable": "per 100,000 population",
 	"unitIndVariable": "per capita, pure, in litres",
 	"situation": "negative",
@@ -136,8 +136,8 @@ var e8_config = {
 	"causality": "yes"
 }
 
-var e9_config = {
-	"title": "Litracy rate and Govt. expenditure on health (% of GDP), 2010",
+var e6_config = {
+	"title": "Litracy rate and government's expenditure on educatino, World, 2010",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
@@ -152,8 +152,8 @@ var e9_config = {
 	"causality": "yes"
 }
 
-var e10_config = {
-	"title": "Obesity and consumption of alcohol, 2010",
+var e4_config = {
+	"title": "Obesity and consumption of alcohol, World, 2010",
 	"geoRegion": "the World",
 	"granularity":"country",
 	"regionID" : "country",
@@ -167,5 +167,5 @@ var e10_config = {
 	"year":"2010",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/alcohol-obesity.csv",
-	"causality": "yes"
+	"causality": "no"
 }

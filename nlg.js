@@ -313,7 +313,9 @@ function stringifyBivariateOutliers(list,ramp){
 	if(isExist(olDepV, list[0][config.regionID]) && isExist(olIndV, list[0][config.regionID])){
 		s += " In comparison to the other " + config.granularity.getPlural() + ", ";
 		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
-		s += getVerb("s","past",depVerb) + " high " + vDepDescriptor + " " +config.depVariable + " as well as high "+ vIndDescriptor + " "+ config.indVariable + "." ;
+		s += getVerb("s","past",depVerb) + " high " + vDepDescriptor + " " +config.depVariable;
+		s += (config.causality=="yes")? " as a result of " : " as well as ";
+		s += " high " + vIndDescriptor + " "+ config.indVariable + "." ;
 	}
 	//removing the outlier that was stated - only remove if there are more that 2 bivariate outliers
 	if (list.length>=2){
@@ -380,7 +382,6 @@ function stringifyList_v2(list,ramp,area){
 	// moreRegionsString = stringifyListOfObjects(list);
 	// console.log(list);
 	var completeList = list;
-	console.log(completeList); 
 	list = getTopNItems(list, 3, 4, config.depVariable);
 
 	switch (list.length) {
