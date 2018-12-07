@@ -398,23 +398,27 @@ function highlightRegion(name){
     .style("opacity", .2);
   d3.select("#" + "map").selectAll(".infoText").remove();
   d3.select("#" + "map").selectAll(".infoIcon").remove();
-  addCompareBtn();
+  addCompareBtn(name);
 
 }
 
-function addCompareBtn(){
+function addCompareBtn(name){
+  
   d3.select("#" + "map")
     .append("text")
     .attr("class", "infoText")
     .attr("x",20)
     .attr("y",23)
-    .text("(Click to compare two "+ config.granularity+")");
+    .text("Click (+) for comparison mode and select any "+ config.granularity+" to compare with " + name);
 
   d3.select("#" + "map")
     .append("text")
     .attr("class", "infoIcon")
     .attr("x",0)
     .attr("y",25)
-    .html("&#x1F6C8;")
+    .style("font-size","24px")
+    .style("font-weight","bold")
+    // .html("&#x1F6C8;")
+    .html("&#x2b;")
 
 }

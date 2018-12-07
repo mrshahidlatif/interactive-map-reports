@@ -29,7 +29,7 @@ var e2_config = {
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
 	"dataFile":"data/health-life-expectancy.csv",
-	"causality": "yes"
+	"causality": "no"
 }
 
 // var e8_config = {
@@ -63,7 +63,7 @@ var e5_config = {
 	"year":"2018",
 	"geoJSONFile":"geography/europe.json",
 	"dataFile":"data/storks-birth-data.csv",
-	"causality":"yes"
+	"causality":"no"
 }
 
 var e7_config = {
@@ -80,7 +80,7 @@ var e7_config = {
 	"year":"2015",
 	"geoJSONFile":"us-states.json",
 	"dataFile":"data/pop-pci-usa.csv",
-	"causality": "yes"
+	"causality": "no"
 }
 var e3_config = {
 	"title": "Adolescent birth rates and use of internet, World, 2015",
@@ -97,7 +97,7 @@ var e3_config = {
 	"year":"2015",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/interneuse-birthrate.csv",
-	"causality": "yes"
+	"causality": "no"
 }
 
 // var e9_config = {
@@ -133,7 +133,7 @@ var e8_config = {
 	"year":"2005",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/cancer-alcohol-deaths.csv",
-	"causality": "yes"
+	"causality": "no"
 }
 
 var e6_config = {
@@ -149,7 +149,7 @@ var e6_config = {
 	"year":"2010",
 	"geoJSONFile":"geography/world.json",
 	"dataFile":"data/literacy-rate-expenditure-on-education.csv",
-	"causality": "yes"
+	"causality": "no"
 }
 
 var e4_config = {

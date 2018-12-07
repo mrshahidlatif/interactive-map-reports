@@ -128,14 +128,15 @@ function generateNarrative(data,config){
 	var moreRegionsWithMaxValueString = "Other similar regions are " + stringifyListOfObjects(regionsWithMaxValues);
 	
 
-	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and it "; 
+	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and the total " + vDepDescriptor + config.depVariable ; 
 	focusVText += " varies from ";
 	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="min"></svg>';
 	focusVText += " in " + '<span class="rID">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
 	focusVText += (regionsWithMinValues.length > 1) ? '<span title="'+ moreRegionsWithMinValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
 	focusVText += " to " + getMax(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="max"></svg>' +  " in " + '<span class="rID">'+ maxRegion[config.regionID].toProperCase() + '</span>';
 	focusVText += (regionsWithMaxValues.length > 1) ? '<span title="'+ moreRegionsWithMaxValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
-	focusVText += " across " + config.geoRegion +".";
+	//focusVText += " across " + config.geoRegion +".";
+	focusVText += ".";
 	
 	//Inline dots storing a gloabal array
 	inlineDots.push({id:"avg", val:avg_dV});
@@ -202,20 +203,18 @@ function generateNarrative(data,config){
 
 	//Paragraph describing relationship among variables 
 	var rText=""; 
-	if(config.causality=="yes"){ //Only print if there is causality in the variables
 		corr = computeCorrelation(allData);
 		// console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
 			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
-			rText += "&mdash;higher the " + vIndDescriptor + config.indVariable + "," ;
-			rText += (config.typeDepVariable=="demographic-indicator" && config.situation == "positive") ? " better is the " : " higher are the " ;
+			rText += "&mdash;the higher the " + vIndDescriptor + config.indVariable + "," ;
+			rText += (config.typeDepVariable=="demographic-indicator" && config.situation == "positive") ? "the better is the " : " higher are the " ;
 			rText += vDepDescriptor + config.depVariable + ".";
 		}
 		else if (corr < NEGATIVE_CORRELATION){
 			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
-			rText += "&mdash;higher the " + vIndDescriptor + config.indVariable + ", lower are the " + vDepDescriptor + config.depVariable + ".";
+			rText += "&mdash;the higher the " + vIndDescriptor + config.indVariable + ", the lower are the " + vDepDescriptor + config.depVariable + ".";
 		}
-	} 
 	rText += generateRegionalCorrelationText(distinctRegions, regionGroups, config);
 
 	var bivariate_outliers = getDataByFlag(data, "BOL");
@@ -255,18 +254,18 @@ function describeOddRegions(l, u, ramp){
 		if (u.length > 0){
 			s +=  (u.length == 1) ? config.granularity + " ": config.granularity.getPlural() + " " ;
 			s += stringifyListOfObjectswithColorCoding(uObjects,ramp);
-			s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
+			s += " are different from their respective neighboring "+ config.granularity.getPlural() + " as they "; 
 			if(config.typeDepVariable == "casualties"){
-				s += " suffered a lot more casualties ";
+				s += " suffered comparatively a lot more casualties ";
 				s += '<span title="'+ infoDifferentFromNeighboringRegions +'" class="moreInfoIcon">&#x1F6C8;</span>' + "."; 
 			}
 		}
 		if (l.length > 0){
 			s +=  (l.length == 1) ? config.granularity + " ": config.granularity.getPlural() + " " ;
 			s += stringifyListOfObjectswithColorCoding(lObjects,ramp);
-			s += " are different from their neighboring "+ config.granularity.getPlural() + " as they "; 
+			s += " are different from their respective neighboring "+ config.granularity.getPlural() + " as they "; 
 			if(config.typeDepVariable == "casualties"){
-				s += " suffered a lot more casualties ";
+				s += " suffered comparatively a lot less casualties ";
 				s += '<span title="'+ infoDifferentFromNeighboringRegions +'" class="moreInfoIcon">&#x1F6C8;</span>' + "."; 
 			}
 		}
@@ -315,7 +314,7 @@ function stringifyBivariateOutliers(list,ramp){
 		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
 		s += getVerb("s","past",depVerb) + " high " + vDepDescriptor + " " +config.depVariable;
 		s += (config.causality=="yes")? " as a result of " : " as well as ";
-		s += " high " + vIndDescriptor + " "+ config.indVariable + "." ;
+		s += " a high " + vIndDescriptor + " "+ config.indVariable + "." ;
 	}
 	//removing the outlier that was stated - only remove if there are more that 2 bivariate outliers
 	if (list.length>=2){
@@ -328,14 +327,16 @@ function stringifyBivariateOutliers(list,ramp){
 		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" ;
 		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.indVariable] + '</span>' + "), ";
 		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
-		s += " shows high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="bol"></svg>' +").";
+		s += " shows a high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="bol"></svg>' +").";
 		inlineDots.push({id:"bol", val:+list[0][config.depVariable]});
 	}
 
 	if(!isExist(olDepV, list[0][config.regionID]) && isExist(olIndV, list[0][config.regionID])){
 		s += " In comparison to the other " + config.granularity.getPlural() + ", ";
 		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
-		s += getVerb("s","past",depVerb) + " low " + vDepDescriptor + " " +config.depVariable + " despite high "+ vIndDescriptor + " "+ config.indVariable + "." ;
+		s += getVerb("s","past",depVerb) + " low " + vDepDescriptor + " " +config.depVariable ;
+		s += (config.causality == "yes") ? " despite a high " : " and a high " ;
+		s +=  vIndDescriptor + " "+ config.indVariable + "." ;
 	}
 	//is it even possible?
 	if(!isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
@@ -493,11 +494,11 @@ function explainOnDemand(name,config,ramp){
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	else if(value_dV > avg_dV){
-		exp += " above average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
+		exp += " an above average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	else if (value_dV < avg_dV){
-		exp += " below average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
+		exp += " a below average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	//Based on independant variable
@@ -511,21 +512,21 @@ function explainOnDemand(name,config,ramp){
 		
 	}
 	else if(value_iV > avg_iV){
-		exp += " and above average "+ vIndDescriptor+ config.indVariable + " (";
+		exp += " and an above average "+ vIndDescriptor+ config.indVariable + " (";
 		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
 		// exp += config.indVariable;
 	}
 	else if (value_iV < avg_iV){
-		exp += " and below average "+ vIndDescriptor+ config.indVariable + " (";
+		exp += " and a below average "+ vIndDescriptor+ config.indVariable + " (";
 		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
 		// exp += config.indVariable;
 	}
 
-	exp += " when compared to the other " + config.granularity.getPlural() + "."; 
+	exp += " compared to the other " + config.granularity.getPlural() + "."; 
 	// console.log(selectedRegion);
 	allData.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
 	var rank = allData.findIndex(x => x[config.regionID].toLowerCase() == name.toLowerCase()) +1; 
-	exp += " It ranks " + toOrdinal(rank) + " among all regions w.r.t "+ config.depVariable + "."; 
+	exp += " It ranks " + toOrdinal(rank) + " among all regions with respect to "+ config.depVariable + "."; 
 
 	if(existNeighborsInfo){
 		var neighbors = geo_neighbors[name.toProperCase()].split(",");
@@ -539,16 +540,16 @@ function explainOnDemand(name,config,ramp){
 		if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="upper"){
 			var objs = getObjectsByNames(allData, neighbors); 
 
-			exp += " Compared to its neighbors, ";
+			exp += " Compared to its neighbors (";
 			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
-			exp +=  ", " + name.toProperCase();
-			exp += getVerb("s","past", depVerb) + " more " + config.depVariable + ".";
+			exp +=  "), " + name.toProperCase();
+			exp += getVerb("s","past", depVerb) + "substantially more " + config.depVariable + ".";
 		}
 		else if(isOutlierAmongNeighbors(arrOfNeighborValues, selectedRegion[0][config.depVariable])=="lower"){
 			var objs = getObjectsByNames(allData, neighbors); 
-			exp += " Compared to its neighbors, ";
+			exp += " Compared to its neighbors (";
 			exp += stringifyListOfObjectswithColorCoding(objs, ramp);
-			exp += ", " + name.toProperCase();
+			exp += "), " + name.toProperCase();
 			exp += getVerb("s","past", depVerb) ;
 			exp += (config.typeDepVariable == "continuous") ? " very few " : " less "; 
 			exp += config.depVariable + ".";
@@ -560,7 +561,7 @@ function explainOnDemand(name,config,ramp){
 function compareTwoRegions(a,b,ramp){
 	var comText = "";
 	inlineDotsEOD.length=0;
-	document.getElementById("eod-head").innerHTML = a + " and " + b;
+	document.getElementById("eod-head").innerHTML = "Comparison of " + a + " and " + b;
 
 	var aObj = allData.filter(function(d){return d[config.regionID].toLowerCase() == a.toLowerCase()})[0];
 	var bObj = allData.filter(function(d){return d[config.regionID].toLowerCase() == b.toLowerCase()})[0];
@@ -571,8 +572,8 @@ function compareTwoRegions(a,b,ramp){
 
 	if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID">' + a + '</span>'; 
-		comText +=  getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
-		comText += " and higher "+ config.indVariable + " (";
+		comText +=  getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
+		comText += " and a higher "+ vIndDescriptor +  config.indVariable + " (";
 		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>'; 
 		comText += ") ";
 		is_a_mentionded= true;
@@ -580,8 +581,8 @@ function compareTwoRegions(a,b,ramp){
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID">' + b + '</span>'; 
-		comText += getVerb("s","past",depVerb) + " higher "+ vDepDescriptor + config.depVariable + " (" + bObj[config.depVariable] + '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
-		comText += " and higher "+ config.indVariable + " (";
+		comText += getVerb("s","past",depVerb) + "a higher "+ vDepDescriptor + config.depVariable + " (" + bObj[config.depVariable] + '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
+		comText += " and a higher " + vIndDescriptor + config.indVariable + " (";
 		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>'; 
 		comText += ") "; 
 		is_b_mentionded = true;
@@ -589,8 +590,8 @@ function compareTwoRegions(a,b,ramp){
 	}
 	else if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID">' + a + '</span>'; 
-		comText += getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
-		comText += " but lower " + vIndDescriptor + config.indVariable + " (";
+		comText += getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
+		comText += " but a lower " + vIndDescriptor + config.indVariable + " (";
 		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>';
 		comText += ") "; 
 		is_a_mentionded= true;
@@ -598,15 +599,15 @@ function compareTwoRegions(a,b,ramp){
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID">' + b + '</span>'; 
-		comText += getVerb("s","past",depVerb) + " higher " + vDepDescriptor + config.depVariable + " ("+bObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
-		comText += " but lower " + vIndDescriptor + config.indVariable + " (";
+		comText += getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+bObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
+		comText += " but a lower " + vIndDescriptor + config.indVariable + " (";
 		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>';
 		comText += ") ";
 		is_b_mentionded = true; 
 		inlineDotsEOD.push({id:"eodB", val:+bObj[config.depVariable]});
 	}
 	if (is_a_mentionded){
-		comText += " when compared to "; 
+		comText += " compared to "; 
 		comText += '<span class="rID">' + b + '</span>';
 		comText += " (" + bObj[config.depVariable]+ " "+ '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + config.depVariable+  ", ";
 		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>';
@@ -614,7 +615,7 @@ function compareTwoRegions(a,b,ramp){
 		inlineDotsEOD.push({id:"eodB", val:+bObj[config.depVariable]});
 	}
 	else if (is_b_mentionded){
-		comText += " when compared to ";
+		comText += " compared to ";
 		comText += '<span class="rID">' + a + '</span>';
 		comText += " (" + aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + " "+ config.depVariable+ ", ";
 		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>';
@@ -849,7 +850,7 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 	// console.log(neg_corr_arr);
 	// console.log(dRs[pos_corr_arr[0]])
 	if(config.causality=="yes" && pos_corr_arr.length>0 && corr < POSITIVE_CORRELATION){
-		text += " Higher "+ vDepDescriptor + config.depVariable + " are associated with higher " + vIndDescriptor + config.indVariable +" among "; 
+		text += "A higher "+ vDepDescriptor + config.depVariable + " are associated with a higher " + vIndDescriptor + config.indVariable +" among "; 
 		if(pos_corr_arr.length==1)
 			text += dRs[pos_corr_arr[0]].appendPostFix() + " " +  config.granularity.getPlural() + ".";
 		else if(pos_corr_arr.length==2)
@@ -860,7 +861,7 @@ function generateRegionalCorrelationText(dRs,rGs, config){
 	}
 	// console.log(neg_corr_arr);
 	if(config.causality=="yes" && neg_corr_arr.length>0 && corr>NEGATIVE_CORRELATION){
-		text += " Lower " + vDepDescriptor + config.depVariable + " are associated with higher "+ vIndDescriptor + config.indVariable +" among "; 
+		text += "A lower " + vDepDescriptor + config.depVariable + " are associated with a higher "+ vIndDescriptor + config.indVariable +" among "; 
 		if(neg_corr_arr.length==1)
 			text += dRs[neg_corr_arr[0]].appendPostFix() + " " + config.granularity.getPlural() + ".";
 		else if(neg_corr_arr.length==2)
@@ -957,7 +958,7 @@ function generateSpatialTrendText(dRs,rGs, config){
 			case 3:
 				text += dRs[3].appendPostFix() + " " + config.granularity.getPlural() + getVerb("p","past", indVerb)+ " higher " + vIndDescriptor + config.indVariable ;
 				if(max_d_index == 3){
-					text =  " "+ dRs[3].appendPostFix() + " "+ config.granularity.getPlural() + getVerb("s","past",indVerb) + " higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity; 
+					text =  " "+ dRs[3].appendPostFix() + " "+ config.granularity.getPlural() + getVerb("s","past",indVerb) + " higher " + vDepDescriptor + config.depVariable + " and " + config.indVariable +" compared to the other "+ config.granularity.getPlural(); 
 				}
 				break;
 		}

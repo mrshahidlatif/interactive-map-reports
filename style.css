@@ -61,7 +61,7 @@ body
     color: black;
     font-size: 12pt;
     text-align: justify;
-    line-height: 1.5;
+    line-height: 1.8;
     height:100%;
     background-color:white;
 }
@@ -246,7 +246,7 @@ div.tooltip {
 }
 /* Info icon and info text in the visualization */
 .infoIcon {
-    font-size: 20px; 
+    font-size: 10px; 
 }
 .infoIcon:hover {
   fill: DodgerBlue;
@@ -254,7 +254,8 @@ div.tooltip {
 }
 
 .infoText{
-  font-size: 12px; 
+  font-size: 10px; 
+  font-weight: italic;
 }
 /*
 .infoText:hover{
