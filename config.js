@@ -8,6 +8,8 @@ var e1_config = {
 	"situation": "negative",
 	"typeDepVariable": "casualties",
 	"typeIndVariable": "incidents",
+	"unitIndSymbol": "",
+	"unitDepSymbol": "",
 	"year":"2017",
 	"geoJSONFile":"us-states.json",
 	"dataFile":"data/storms-death-data.csv",

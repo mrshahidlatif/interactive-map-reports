@@ -149,6 +149,7 @@ function generateNarrative(data,config){
 	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and it " ; 
 	focusVText += " varies from ";
 	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="min"></svg>';
+	focusVText += (regionsWithMinValues.length > 1) ? ", for example, ":"";
 	focusVText += " in " + '<span class="rID">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
 	focusVText += (regionsWithMinValues.length > 1) ? '<span title="'+ moreRegionsWithMinValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
 	focusVText += " to " + getMax(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="max"></svg>' +  " in " + '<span class="rID">'+ maxRegion[config.regionID].toProperCase() + '</span>';
@@ -343,9 +344,9 @@ function stringifyBivariateOutliers(list,ramp){
 	//Case 2 - outlier in dependent variable but not in independent variable
 	if(isExist(olDepV, list[0][config.regionID]) && !isExist(olIndV, list[0][config.regionID])){
 		s += " Despite having a relatively small "+ vIndDescriptor + " " +config.indVariable + " (" ;
-		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.indVariable] + '</span>' + "), ";
+		s += '<span class="rID" style="background-color:'+ramp(list[0][config.indVariable])+'">' + list[0][config.indVariable] + '</span>'+ vIndUnit + "), ";
 		s += '<span class="rID">' + list[0][config.regionID].toProperCase()+ '</span>' ; 
-		s += " shows a high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="bol"></svg>' +").";
+		s += " shows a high " + vDepDescriptor + " " + config.depVariable + " (" + list[0][config.depVariable]+ vDepUnit + '<svg width="'+ W +'"height="'+ H + '" id="bol"></svg>' +").";
 		inlineDots.push({id:"bol", val:+list[0][config.depVariable]});
 	}
 
