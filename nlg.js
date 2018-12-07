@@ -50,18 +50,27 @@ function generateNarrative(data,config){
 	if (config.typeDepVariable == "casualties" || config.typeDepVariable == "incidents"){
 		vDepDescriptor = " number of "
 		depVerb = " " + verb_incidents[Math.floor(Math.random()*verb_incidents.length)] + " ";
+		vDepUnit = config.unitDepSymbol;
 	}
 	else if (config.typeDepVariable == "demographic-indicator") {
 		vDepDescriptor = "";
 		depVerb = " " + verb_demographic_indicator[Math.floor(Math.random()*verb_demographic_indicator.length)] + " ";
+		vDepUnit = config.unitDepSymbol;
 	}
 	else if (config.typeDepVariable == "quantitative"){
 		vDepDescriptor = " number of ";
 		depVerb = " " + verb_quantitative[Math.floor(Math.random()*verb_quantitative.length)] + " "; 
+		vDepUnit = config.unitDepSymbol;
 	}
 	else if (config.typeDepVariable == "uncountable"){
 		vDepDescriptor = " ";
 		depVerb = " " + verb_uncountable[Math.floor(Math.random()*verb_uncountable.length)] + " "; 
+		vDepUnit = config.unitDepSymbol;
+	}
+	else if (config.typeDepVariable == "percentage"){
+		vDepDescriptor = " percentage of ";
+		depVerb = " " + verb_uncountable[Math.floor(Math.random()*verb_uncountable.length)] + " "; 
+		vDepUnit = config.unitDepSymbol;
 	
 	}
 
@@ -69,19 +78,28 @@ function generateNarrative(data,config){
 	if (config.typeIndVariable == "quantitative" ){
 		vIndDescriptor = " number of ";
 		indVerb = " " + verb_quantitative[Math.floor(Math.random()*verb_quantitative.length)] + " "; 
+		vIndUnit = config.unitIndSymbol;
 	}
 	else if (config.typeIndVariable == "casualties" || config.typeIndVariable == "incidents"){
 		vIndDescriptor = " number of ";
 		indVerb = " " + verb_incidents[Math.floor(Math.random()*verb_incidents.length)] + " ";
+		vIndUnit = config.unitIndSymbol;
 
 	}
 	else if (config.typeIndVariable == "monetary") {
-		vIndDescriptor = " values of ";
+		vIndDescriptor = " ";
 		indVerb = " " + verb_monetary[Math.floor(Math.random()*verb_monetary.length)] + " ";
+		vIndUnit = config.unitIndSymbol;
 	}
 	else if (config.typeIndVariable == "uncountable") {
 		vIndDescriptor = " ";
 		indVerb = " " + verb_uncountable[Math.floor(Math.random()*verb_uncountable.length)] + " ";
+		vIndUnit = config.unitIndSymbol;
+	}
+	else if (config.typeIndVariable == "percentage") {
+		vIndDescriptor = " percentage of ";
+		indVerb = " " + verb_uncountable[Math.floor(Math.random()*verb_uncountable.length)] + " ";
+		vIndUnit = config.unitIndSymbol;
 	}
 
 	data.sort(function(a,b){return +b[config.depVariable] - +a[config.depVariable]});
@@ -128,7 +146,7 @@ function generateNarrative(data,config){
 	var moreRegionsWithMaxValueString = "Other similar regions are " + stringifyListOfObjects(regionsWithMaxValues);
 	
 
-	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and the total " + vDepDescriptor + config.depVariable ; 
+	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and it " ; 
 	focusVText += " varies from ";
 	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="min"></svg>';
 	focusVText += " in " + '<span class="rID">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
@@ -206,14 +224,14 @@ function generateNarrative(data,config){
 		corr = computeCorrelation(allData);
 		// console.log(corr); 
 		if(corr > POSITIVE_CORRELATION){
-			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
-			rText += "&mdash;the higher the " + vIndDescriptor + config.indVariable + "," ;
+			rText += " Overall, there is a statistical relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
+			rText += ": the higher the " + vIndDescriptor + config.indVariable + "," ;
 			rText += (config.typeDepVariable=="demographic-indicator" && config.situation == "positive") ? "the better is the " : " higher are the " ;
 			rText += vDepDescriptor + config.depVariable + ".";
 		}
 		else if (corr < NEGATIVE_CORRELATION){
-			rText += " Overall, there is a relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
-			rText += "&mdash;the higher the " + vIndDescriptor + config.indVariable + ", the lower are the " + vDepDescriptor + config.depVariable + ".";
+			rText += " Overall, there is a statistical relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
+			rText += ": the higher the " + vIndDescriptor + config.indVariable + ", the lower are the " + vDepDescriptor + config.depVariable + ".";
 		}
 	rText += generateRegionalCorrelationText(distinctRegions, regionGroups, config);
 
@@ -486,39 +504,39 @@ function explainOnDemand(name,config,ramp){
 	exp += getVerb("s","past",depVerb) ;
 
 	if(value_dV == getMin(allData,config.depVariable)) {
-		exp += (value_dV==0) ? "no " : "the lowest" + vDepDescriptor + config.depVariable + " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
+		exp += (value_dV==0) ? "no " : "the lowest" + vDepDescriptor + config.depVariable + " (" + value_dV +  vDepUnit+  '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	else if(value_dV == getMax(allData,config.depVariable)) {
-		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor +config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
+		exp += (value_dV==0) ? "no " : "the highest" + vDepDescriptor +config.depVariable+ " (" + value_dV +  vDepUnit+  '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	else if(value_dV > avg_dV){
-		exp += " an above average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
+		exp += " an above average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV +  vDepUnit+  '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	else if (value_dV < avg_dV){
-		exp += " a below average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV + '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
+		exp += " a below average "  + vDepDescriptor +  config.depVariable+ " (" + value_dV +  vDepUnit+  '<svg width="'+ W +'"height="'+ H + '" id="eod0"></svg>'+ ") ";
 		inlineDotsEOD.push({id:"eod0", val:+value_dV});
 	}
 	//Based on independant variable
 	if(value_iV == getMin(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + config.indVariable + " (" + '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		exp += (value_iV==0) ? "no " : "the lowest" + vIndDescriptor + config.indVariable + " (" + '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +vIndUnit +") ";
 	}
 	else if(value_iV == getMax(allData,config.indVariable)) {
 		exp += " and " ;
-		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + config.indVariable + "(" + '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		exp += (value_iV==0) ? "no " : "highest" + vIndDescriptor + config.indVariable + "(" + '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString()+ '</span>' +vIndUnit +") ";
 		
 	}
 	else if(value_iV > avg_iV){
 		exp += " and an above average "+ vIndDescriptor+ config.indVariable + " (";
-		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>'+vIndUnit +") ";
 		// exp += config.indVariable;
 	}
 	else if (value_iV < avg_iV){
 		exp += " and a below average "+ vIndDescriptor+ config.indVariable + " (";
-		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>' +") ";
+		exp += '<span class="rID" style="background-color:'+ramp(value_iV)+'">' + value_iV.toLocaleString() + '</span>'+vIndUnit +") ";
 		// exp += config.indVariable;
 	}
 
@@ -572,36 +590,36 @@ function compareTwoRegions(a,b,ramp){
 
 	if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID">' + a + '</span>'; 
-		comText +=  getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
+		comText +=  getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ vDepUnit+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
 		comText += " and a higher "+ vIndDescriptor +  config.indVariable + " (";
-		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>'; 
+		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>'+ vIndUnit; 
 		comText += ") ";
 		is_a_mentionded= true;
 		inlineDotsEOD.push({id:"eodA", val:+aObj[config.depVariable]});
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID">' + b + '</span>'; 
-		comText += getVerb("s","past",depVerb) + "a higher "+ vDepDescriptor + config.depVariable + " (" + bObj[config.depVariable] + '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
+		comText += getVerb("s","past",depVerb) + "a higher "+ vDepDescriptor + config.depVariable + " (" + bObj[config.depVariable] +  vDepUnit+  '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
 		comText += " and a higher " + vIndDescriptor + config.indVariable + " (";
-		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>'; 
+		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>'+vIndUnit; 
 		comText += ") "; 
 		is_b_mentionded = true;
 		inlineDotsEOD.push({id:"eodB", val:+bObj[config.depVariable]});
 	}
 	else if(+aObj[config.depVariable]>+bObj[config.depVariable] && +aObj[config.indVariable]<+bObj[config.indVariable]){
 		comText += '<span class="rID">' + a + '</span>'; 
-		comText += getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
+		comText += getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+aObj[config.depVariable]+  vDepUnit+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + ") ";
 		comText += " but a lower " + vIndDescriptor + config.indVariable + " (";
-		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>';
+		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString()+vIndUnit + '</span>';
 		comText += ") "; 
 		is_a_mentionded= true;
 		inlineDotsEOD.push({id:"eodA", val:+aObj[config.depVariable]});
 	}
 	else if(+aObj[config.depVariable]<+bObj[config.depVariable] && +aObj[config.indVariable]>+bObj[config.indVariable]){
 		comText += '<span class="rID">' + b + '</span>'; 
-		comText += getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+bObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
+		comText += getVerb("s","past",depVerb) + "a higher " + vDepDescriptor + config.depVariable + " ("+bObj[config.depVariable]+  vDepUnit+  '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + ") ";
 		comText += " but a lower " + vIndDescriptor + config.indVariable + " (";
-		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>';
+		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>'+vIndUnit;
 		comText += ") ";
 		is_b_mentionded = true; 
 		inlineDotsEOD.push({id:"eodB", val:+bObj[config.depVariable]});
@@ -609,16 +627,16 @@ function compareTwoRegions(a,b,ramp){
 	if (is_a_mentionded){
 		comText += " compared to "; 
 		comText += '<span class="rID">' + b + '</span>';
-		comText += " (" + bObj[config.depVariable]+ " "+ '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + config.depVariable+  ", ";
-		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>';
+		comText += " (" + bObj[config.depVariable]+  vDepUnit+  " "+ '<svg width="'+ W +'"height="'+ H + '" id="eodB"></svg>' + config.depVariable+  ", ";
+		comText += '<span class="rID" style="background-color:'+ramp(bObj[config.indVariable])+'">' + bObj[config.indVariable].toLocaleString() + '</span>'+vIndUnit;
 		comText += " "+config.indVariable +").";
 		inlineDotsEOD.push({id:"eodB", val:+bObj[config.depVariable]});
 	}
 	else if (is_b_mentionded){
 		comText += " compared to ";
 		comText += '<span class="rID">' + a + '</span>';
-		comText += " (" + aObj[config.depVariable]+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + " "+ config.depVariable+ ", ";
-		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString() + '</span>';
+		comText += " (" + aObj[config.depVariable]+  vDepUnit+" "+ '<svg width="'+ W +'"height="'+ H + '" id="eodA"></svg>' + " "+ config.depVariable+ ", ";
+		comText += '<span class="rID" style="background-color:'+ramp(aObj[config.indVariable])+'">' + aObj[config.indVariable].toLocaleString()+ '</span>'+vIndUnit ;
 		comText += " "+config.indVariable +").";
 		inlineDotsEOD.push({id:"eodA", val:+aObj[config.depVariable]});
 	}
