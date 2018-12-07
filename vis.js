@@ -177,13 +177,15 @@ function generateVis(canvas, config){
         .on("click",function(d){
           if(isCompareMode){
             selectedRegions.push(d.properties.name);
-            svg.selectAll("path").style("opacity", 1);
+            // svg.selectAll("path").style("opacity", 1);
+            svg.selectAll("path").style("stroke-width",2).style("stroke","Dodgerblue");
             svg.selectAll("path").filter(function(d){
               if (d.properties.name != selectedRegions[0] && d.properties.name != selectedRegions[1] ){
                 return true; 
               }
             })
-              .style("opacity", .2);
+              // .style("opacity", .2);
+              .style("stroke-width",0.5).style("stroke","black");
             compareTwoRegions(selectedRegions[0],selectedRegions[1],ramp);
             selectedRegions.length=0;
             d3.select("#" + "map").selectAll(".infoText").remove();
@@ -347,7 +349,8 @@ function generateVis(canvas, config){
 
 }
 function resetShading(){
-   var regions = d3.select("#" + "map").selectAll("path").style("opacity", 1);
+  //  var regions = d3.select("#" + "map").selectAll("path").style("opacity", 1);
+  var regions = d3.select("#" + "map").selectAll("path").style("stroke-width", 0.5).style("stroke","black");
 }
 
 // https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
@@ -392,10 +395,13 @@ String.prototype.getPlural = function () {
 
 function highlightRegion(name){
   // console.log(name);
-  var regions = d3.select("#" + "map").selectAll("path").style("opacity", 1);
+  // var regions = d3.select("#" + "map").selectAll("path").style("opacity", 1);
+  var regions = d3.select("#" + "map").selectAll("path").style("stroke-width", 2).style("stroke","Dodgerblue");
+  
   var regions = d3.select("#" + "map")
     .selectAll("path").filter(function(d){return d.properties.name != name;})
-    .style("opacity", .2);
+    .style("stroke-width", 0.5)
+    .style("stroke","black");
   d3.select("#" + "map").selectAll(".infoText").remove();
   d3.select("#" + "map").selectAll(".infoIcon").remove();
   addCompareBtn(name);
