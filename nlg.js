@@ -146,7 +146,7 @@ function generateNarrative(data,config){
 	var moreRegionsWithMaxValueString = "Other similar regions are " + stringifyListOfObjects(regionsWithMaxValues);
 	
 
-	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and it " ; 
+	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + vDepUnit + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and it " ; 
 	focusVText += " varies from ";
 	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="min"></svg>';
 	focusVText += (regionsWithMinValues.length > 1) ? ", for example, ":"";
