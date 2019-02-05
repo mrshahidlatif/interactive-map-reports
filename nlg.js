@@ -148,7 +148,7 @@ function generateNarrative(data,config){
 
 	focusVText += " The average " + vDepDescriptor + config.depVariable + " per " + config.granularity + " was " + avg_dV.toLocaleString() + vDepUnit + '<svg width="'+ W +'"height="'+ H + '" id="avg"></svg>' + ", and it " ; 
 	focusVText += " varies from ";
-	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances " : getMin(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="min"></svg>';
+	focusVText += getMin(allData, config.depVariable) == 0 ? " no instances" : getMin(allData, config.depVariable).toLocaleString() + '<svg width="'+ W +'"height="'+ H + '" id="min"></svg>';
 	focusVText += (regionsWithMinValues.length > 1) ? ", for example, ":"";
 	focusVText += " in " + '<span class="rID">' + minRegion[config.regionID].toProperCase()+ '</span>' + " ";
 	focusVText += (regionsWithMinValues.length > 1) ? '<span title="'+ moreRegionsWithMinValueString +'" class="moreInfoIcon">&#x1F6C8;</span>' : "";
@@ -227,7 +227,7 @@ function generateNarrative(data,config){
 		if(corr > POSITIVE_CORRELATION){
 			rText += " Overall, there is a statistical relationship between " + vIndDescriptor + config.indVariable + " and " + vDepDescriptor + config.depVariable;
 			rText += ": the higher the " + vIndDescriptor + config.indVariable + "," ;
-			rText += (config.typeDepVariable=="demographic-indicator" && config.situation == "positive") ? "the better is the " : " higher are the " ;
+			rText += (config.typeDepVariable=="demographic-indicator" && config.situation == "positive") ? " the better is the " : " higher are the " ;
 			rText += vDepDescriptor + config.depVariable + ".";
 		}
 		else if (corr < NEGATIVE_CORRELATION){
