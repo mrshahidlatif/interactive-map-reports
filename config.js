@@ -26,7 +26,7 @@ var e2_config = {
 	"typeDepVariable": "demographic-indicator",
 	"typeIndVariable": "monetary",
 	"unitDepVariable": "years",
-	"unitIndVariable": "USD, per houshold",
+	"unitIndVariable": "USD, per household",
 	"unitIndSymbol": " USD",
 	"unitDepSymbol": " years",
 	"situation": "positive",
