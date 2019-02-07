@@ -130,7 +130,7 @@ a:hover{
     float: left;
     width: 48%;
     /*background-color: #f1f1f1;*/
-/*    padding-top: 20px;*/
+   /* padding-top: 22px; */
     padding-left: 20px;
     padding-right: 10px;
     /*max-height: 1000px;*/
@@ -327,3 +327,8 @@ svg {
     display: inline-block;
      vertical-align: middle;
   }
+
+span mySpan {
+    display: inline-block;
+    width: 50px;
+}
